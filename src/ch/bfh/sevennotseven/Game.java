@@ -47,7 +47,7 @@ public class Game {
 	}
 	
 	public int[][] getField(){
-		return null;
+		return field;
 	
 	}
 	
@@ -115,10 +115,11 @@ public class Game {
 				field[x][y] = nextBlocks.remove(0); // fill with the first element of nextBlocks
 			}
 			
-			// add n new colors to nextBlocks according to the level number.
-			for(int i = 0; i < (level * 3); i++){
-				nextBlocks.add(rand.nextInt(numberOfColors));	
-			}
+		}
+		
+		// add n new colors to nextBlocks according to the level number.
+		for(int i = 0; i < (level * 3); i++){
+			nextBlocks.add(rand.nextInt(numberOfColors));	
 		}
 	}
 }

@@ -17,7 +17,7 @@ import java.awt.event.WindowEvent;
 public class Window extends Frame {
 	
 	private Game game;
-	private Field field;
+	private FieldCanvas field;
 
 	/**
 	 * @param title
@@ -33,7 +33,7 @@ public class Window extends Frame {
 			}
 		});
 		
-		field = new Field();
+		field = new FieldCanvas();
 		field.setSize(7);
 		game = new Game();
 		
@@ -42,11 +42,7 @@ public class Window extends Frame {
 		this.setSize(400,400);
 		this.setVisible(true);
 		
-		
-		int [][] testfield = new int[7][7];
-		testfield[0][0] = 2;
-		testfield[1][3] = 4;
-		field.setField(testfield);
+		field.setField(game.getField());
 
 
 	}

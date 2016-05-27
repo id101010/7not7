@@ -4,7 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 
-public class Field extends Canvas {
+public class FieldCanvas extends Canvas {
 	
 	private int size;
 	private int[][] field;
