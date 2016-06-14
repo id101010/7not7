@@ -3,13 +3,18 @@ package ch.bfh.sevennotseven;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
 
-public class FieldCanvas extends Canvas {
+public class FieldCanvas extends Canvas{
 	
 	private int size;
 	private int[][] field;
 	
 	static final Color[] colors = {Color.red,Color.green, Color.blue, Color.yellow,Color.magenta};
+	
+	FieldCanvas(){
+
+	}
 	
 	public void setSize(int s) {
 		this.size = s;

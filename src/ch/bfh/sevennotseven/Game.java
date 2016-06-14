@@ -16,6 +16,7 @@ public class Game {
 	private int level;
 	private int score;
 	private int size;
+	private int freeBlocks;
 	private Random rand;
 	
 	public Game(){
@@ -23,9 +24,14 @@ public class Game {
 	}
 	
 	public Game (int size) {
+		/* Initialize variables */
 		this.size = size;
+		this.level = 1;
+		this.score = 0;
+		this.freeBlocks = size * size;
+		
+		rand = new Random(); // Initialize random object
 		this.reset();
-	
 	}
 	
 	public boolean isGameOver(){
@@ -39,7 +45,7 @@ public class Game {
 	}
 	
 	public int getLevel(){
-		return 0;
+		return level;
 	}
 	
 	public List<Integer> getNextBlocks(){
@@ -90,9 +96,6 @@ public class Game {
 		field = new int[size][size];
 		level = 1;
 		score = 0;
-			
-		// Initialize random object
-		rand = new Random();
 		
 		// Populate game field
 		this.populateField();
@@ -103,23 +106,23 @@ public class Game {
 	 * Add n new blocks to random positions on the field, 
 	 * according to the level number.
 	 */
-	private void populateField(){
+	public void populateField(){
 		
 		// while there are blocks left in nextBlocks
-		while(nextBlocks.size() > 0){
+		while((nextBlocks.size() > 0) && (freeBlocks > 0)){
 			int x = rand.nextInt(size); // get random x position
 			int y = rand.nextInt(size); // get random y position
 			
 			// if the position is free
 			if(field[x][y] == 0){
 				field[x][y] = nextBlocks.remove(0); // fill with the first element of nextBlocks
+				freeBlocks--;
 			}
-			
 		}
 		
 		// add n new colors to nextBlocks according to the level number.
 		for(int i = 0; i < (level * 3); i++){
-			nextBlocks.add(rand.nextInt(numberOfColors));	
+			nextBlocks.add(1 + rand.nextInt(numberOfColors));	
 		}
 	}
 }
