@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -18,10 +19,11 @@ public class FieldCanvas extends JPanel{
 	private int size;
 	private Game game;
 	private Point src;
+	private Point dst;
+	private List<Point> path;
 	
 	FieldCanvas(){
-		
-		addMouseListener(new MouseAdapter(){
+		MouseAdapter ad = new MouseAdapter(){
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
@@ -35,17 +37,37 @@ public class FieldCanvas extends JPanel{
 			}
 			
 			@Override
+			public void mouseDragged(MouseEvent e) {
+				super.mouseDragged(e);
+				if(src!=null) {
+					Point lastDst = dst;
+					dst = FieldCanvas.this.getClickPoint(e.getPoint());
+					if(lastDst!=dst) { //hovered field changed
+						path= game.getPath(src, dst);
+						repaint();
+					}
+				} else {
+					dst = null;
+					path = null;
+				}
+			};
+			
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				super.mouseReleased(e);
-				Point p = FieldCanvas.this.getClickPoint(e.getPoint());
-				if(p != null && src!=null) {
-					System.out.println("Moving from "+src.toString()+ " to "+p.toString());
-					game.doMove(src, p);
+				dst = FieldCanvas.this.getClickPoint(e.getPoint());
+				path = null;
+				if(dst != null && src!=null) {
+					System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
+					game.doMove(src, dst);
 					repaint();
 				}
 				src = null;
 			}
-		});
+		};
+		
+		addMouseListener(ad);
+		addMouseMotionListener(ad);
 
 	}
 	
@@ -95,6 +117,30 @@ public class FieldCanvas extends JPanel{
 					g.fillRect(x*space+2, y*space+2, space -3, space -3);	
 				}
 			}
+		}
+		
+		if(path!=null && src!=null && dst!=null) {
+			int colorCode = game.getField()[src.x][src.y];
+			Color c = colors[colorCode-1];
+			int sSpace = space/3;	
+			int sSpace2 = space/5;
+			
+			g.setColor(Color.lightGray);
+			g.fillRect(src.x*space+2, src.y*space+2, space -3, space -3);
+			g.fillRect(dst.x*space+2, dst.y*space+2, space -3, space -3);
+			
+			g.setColor(c);
+			g.fillRect(src.x*space+2+sSpace2, src.y*space+2+sSpace2, space -3 - 2* sSpace2, space -3 - 2* sSpace2);
+			
+			
+			for(int i=1; i<path.size() -1; i++) {
+				Point p = path.get(i);
+				g.fillRect(p.x*space+2+sSpace, p.y*space+2+sSpace, space -3 - 2* sSpace, space -3 - 2* sSpace);
+			}
+			g.fillRect(dst.x*space+2+sSpace2, dst.y*space+2+sSpace2, space -3 - 2* sSpace2, space -3 - 2* sSpace2);
+			
+			
+			
 		}
 		
 	}
