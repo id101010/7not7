@@ -10,10 +10,14 @@ import javax.swing.JPanel;
 
 public class FieldCanvas extends JPanel{
 	private static final long serialVersionUID = 1L;
+	static final int border = 5;
+	static final Color[] colors = {Color.red,Color.green, Color.blue, Color.yellow,Color.magenta};
+	
+	
+	
 	private int size;
 	private Game game;
-	
-	static final Color[] colors = {Color.red,Color.green, Color.blue, Color.yellow,Color.magenta};
+	private Point src;
 	
 	FieldCanvas(){
 		
@@ -21,19 +25,37 @@ public class FieldCanvas extends JPanel{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
-				Point point = e.getPoint();
 				
-				int total = Math.min(FieldCanvas.this.getHeight(),FieldCanvas.this.getWidth())-10;
-				int space = total/size;
-							
-				
-				
-				
-				
-				repaint();
+				Point p = FieldCanvas.this.getClickPoint(e.getPoint());
+				if(p==null) { //invalid click
+					src = null;
+				} else {
+					src = p;
+				}
+			}
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				super.mouseReleased(e);
+				Point p = FieldCanvas.this.getClickPoint(e.getPoint());
+				if(p != null && src!=null) {
+					System.out.println("Moving from "+src.toString()+ " to "+p.toString());
+					game.doMove(src, p);
+					repaint();
+				}
+				src = null;
 			}
 		});
 
+	}
+	
+	private Point getClickPoint(Point globalPos) {
+		int total = Math.min(this.getHeight(),FieldCanvas.this.getWidth())-2*border;
+		int space = total/size;
+
+		globalPos.translate(-border, -border);
+		if(globalPos.x<0 || globalPos.x >total  || globalPos.y < 0 || globalPos.y > total) return null;
+		return new Point(globalPos.x/space,globalPos.y/space);	
 	}
 	
 	public void setGame(Game game) {
@@ -49,8 +71,8 @@ public class FieldCanvas extends JPanel{
 		super.paintComponent(g);
 		g.setColor(Color.lightGray);
 		
-		g.translate(5, 5);
-		int total = Math.min(this.getHeight(),this.getWidth())-10;
+		g.translate(border, border);
+		int total = Math.min(this.getHeight(),this.getWidth())-2*border;
 		int space = total/size;
 		
 		g.setClip(0, 0, total-1,total-1);

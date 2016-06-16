@@ -58,7 +58,10 @@ public class Game {
 	}
 	
 	public boolean canMove(Point src, Point dst){
-		return getPath(src, dst)!=null;
+		//TODO: uncomment next line and implement getPath
+		
+		//return getPath(src, dst)!=null;
+		return true;
 	}
 	
 	public boolean doMove(Point src, Point dst){
