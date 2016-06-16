@@ -94,6 +94,15 @@ public class Game {
 		Vertex v = new Vertex(0, dst);
 		int tmp, tmp_i = 0;
 		int alt = 0;
+
+		// Get a verticies list from the field data
+		for(int i = 0; i < size; i++){
+			for(int j = 0; i < size; i++){
+				if(field[i][j] == 0){
+					vertices.add(new Vertex(Integer.MAX_VALUE, new Point(i, j)));		
+				}		
+			}
+		}
 		
 		for(int i = 0; i < size*size; i++){
 			vertices.add(new Vertex(Integer.MAX_VALUE, new Point(i%7,i%7))); // Initialize all vertices
