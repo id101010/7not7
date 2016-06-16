@@ -132,7 +132,7 @@ public class Game {
 			
 		}
 
-		return reconstructShortestPath(allVerticies, dst);
+		return reconstructShortestPath(allVerticies, src,dst);
 	}
 	
 	public boolean doUndo(){
@@ -214,7 +214,7 @@ public class Game {
 		return null;
 	}
 	
-	private List<Point> reconstructShortestPath(final List<Vertex> vertices, final Point dst) {
+	private List<Point> reconstructShortestPath(final List<Vertex> vertices, final Point src, final Point dst) {
 		ArrayList<Point> path = new ArrayList<Point>();
 		path.add(dst);
 		Vertex u = findVertex(dst, vertices);
@@ -224,6 +224,9 @@ public class Game {
 		while(u.getPrev()!=null) {
 			u= u.getPrev();
 			path.add(0, u.getPos());
+		}
+		if(u!=findVertex(src, vertices)) {
+			return null;
 		}
 		return path;
 	}
