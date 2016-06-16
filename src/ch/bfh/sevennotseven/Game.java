@@ -40,7 +40,7 @@ public class Game {
 	}
 	
 	public int getScore(){
-		return 0;
+		return score;
 	
 	}
 	
@@ -58,11 +58,16 @@ public class Game {
 	}
 	
 	public boolean canMove(Point src, Point dst){
-		return false;
+		return getPath(src, dst)!=null;
 	}
 	
 	public boolean doMove(Point src, Point dst){
-		return false;
+		if(!canMove(src, dst)) return false; //checking if there is a path from src to dest
+		if(field[src.x][src.y]==0) return false;
+		field[dst.x][dst.y] = field[src.x][src.y];
+		field[src.x][src.y] = 0;
+		nextStep(dst); //cleanup rows or add new blocks
+		return true;
 	}
 	
 	public List<Point> getPath(Point src, Point dst){
@@ -74,7 +79,15 @@ public class Game {
 	}
 	
 	public boolean doFreeMove(Point src, Point dst){
-		return false;
+		//move without path checking
+		if(getAvailFreeMoves() <= 0 ) return false;
+		if(field[src.x][src.y]==0) return false;
+		field[dst.x][dst.y] = field[src.x][src.y];
+		field[src.x][src.y] = 0;
+		nextStep(dst); //cleanup rows or add new blocks
+		return true;
+		
+		
 	}
 	
 	public int getAvailFreeMoves(){
@@ -101,12 +114,24 @@ public class Game {
 		this.populateField();
 	}
 	
+	
+	/**
+	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
+	 */
+	private void nextStep(Point lastPoint) {
+		//TODO: Check if there are any new rows (with at least 4 elements horizontally, vertically, or diagonal) near lastpoint
+		//TODO:  if so: remove the row, add some points or extras and quit
+		//TODO:  if not: 
+		populateField(); //add new blocks
+		
+	}
+	
 	/*
-	 * Calculates the next game step.
-	 * Add n new blocks to random positions on the field, 
+
+	 * Adds n new blocks to random positions on the field, 
 	 * according to the level number.
 	 */
-	public void populateField(){
+	private void populateField(){
 		
 		// while there are blocks left in nextBlocks
 		while((nextBlocks.size() > 0) && (freeBlocks > 0)){
