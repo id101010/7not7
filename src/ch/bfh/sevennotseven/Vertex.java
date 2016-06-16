@@ -19,7 +19,7 @@ public class Vertex {
 	public Vertex(int dist, Point pos) {
 		this.dist = dist;
 		this.pos = pos;
-		this.prev = new Vertex(0, new Point(0,0));
+		this.prev = null;
 	}
 
 	/**
