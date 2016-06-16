@@ -65,16 +65,77 @@ public class Game {
 	}
 	
 	public boolean doMove(Point src, Point dst){
-		if(!canMove(src, dst)) return false; //checking if there is a path from src to dest
-		if(field[src.x][src.y]==0) return false;
+		
+		if(!canMove(src, dst)) {
+			return false; //checking if there is a path from src to dest
+		}
+		
+		if(field[src.x][src.y]==0) {
+			return false;
+		}
+		
 		field[dst.x][dst.y] = field[src.x][src.y];
 		field[src.x][src.y] = 0;
+		
 		nextStep(dst); //cleanup rows or add new blocks
+		
 		return true;
 	}
 	
-	public List<Point> getPath(Point src, Point dst){
-		return null;
+	/*
+	 *  Pathfinding of shortest path between src and dst.
+	 */
+	public ArrayList<Vertex> getPath(Point src, Point dst){
+		
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>();	// List of vertices
+		ArrayList<Vertex> path = new ArrayList<Vertex>();	// Output
+		
+		Vertex u = new Vertex(0, src);
+		Vertex v = new Vertex(0, dst);
+		int tmp, tmp_i = 0;
+		int alt = 0;
+		
+		for(int i = 0; i < size*size; i++){
+			vertices.add(new Vertex(Integer.MAX_VALUE, new Point(i%7,i%7))); // Initialize all vertices
+		}
+		
+		vertices.get(src.x * src.y).setDist(0); // Set distance from source to source
+		
+		
+		while(!vertices.isEmpty()){ 			// As long as there are vertices 
+			tmp = minDistance(u, vertices);		// Get the index of v with the least distance to u
+			u = vertices.get(tmp);
+			vertices.remove(tmp);				// Remove u from the set of vertices
+			
+			for(int i = 0; i < 4; i++){			// for each neighbour of u ...
+				if(i == 0){
+					tmp_i = u.getPrev().x * u.getPrev().y - 7; // neighbour above
+				}
+				
+				if(i == 1){
+					tmp_i = u.getPrev().x * u.getPrev().y + 7; // neighbour below					
+				}
+				
+				if(i == 2){
+					tmp_i = u.getPrev().x * u.getPrev().y - 1; // left neighbour							
+				}
+				
+				if(i == 3){
+					tmp_i = u.getPrev().x * u.getPrev().y + 1; // right neighbour						
+				}
+				
+				if(tmp_i >= 0 && tmp_i <= 49){
+					alt = u.getDist() + distanceBetween(u,v);
+					if(alt < v.getDist()){	// A shorter path has been found
+						v.setDist(alt);
+						v.setPrev(u.getPrev());
+						path.add(v);
+					}
+				}
+			}
+		}
+
+		return path;
 	}
 	
 	public boolean doUndo(){
@@ -83,11 +144,18 @@ public class Game {
 	
 	public boolean doFreeMove(Point src, Point dst){
 		//move without path checking
-		if(getAvailFreeMoves() <= 0 ) return false;
-		if(field[src.x][src.y]==0) return false;
+		if(getAvailFreeMoves() <= 0 ) {
+			return false;
+		}
+		
+		if(field[src.x][src.y]==0) {
+			return false;
+		}
+		
 		field[dst.x][dst.y] = field[src.x][src.y];
 		field[src.x][src.y] = 0;
 		nextStep(dst); //cleanup rows or add new blocks
+		
 		return true;
 		
 		
@@ -117,6 +185,38 @@ public class Game {
 		this.populateField();
 	}
 	
+	/**
+	 * Calculates the minimal distance between a vertex and a set of vertices.
+	 */
+	private int minDistance(Vertex v, ArrayList<Vertex> vertices){
+		int dist = Integer.MAX_VALUE;
+		int tmp = 0;
+		int out = 0;
+		
+		for (int i = 0; i < vertices.size(); i++) {
+			tmp = distanceBetween(v, vertices.get(i));
+			
+			if(tmp < dist){
+				dist = tmp;
+				out = i;
+			}
+		}
+		
+		return out;
+	}
+	
+	/**
+	 * Calculates the distance between two vertices.
+	 */
+	private int distanceBetween(Vertex v1, Vertex v2){
+		int dx = 0;
+		int dy = 0;
+		
+		dx = v2.getPrev().x - v2.getPrev().x;
+		dy = v2.getPrev().x - v2.getPrev().x;
+		
+		return (int) Math.sqrt(dx*dx + dy*dy);
+	}
 	
 	/**
 	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
