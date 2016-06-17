@@ -17,6 +17,8 @@ public class Game {
 	private int score;
 	private int size;
 	private int freeBlocks;
+	private int freeMoves;
+	private int numUndos;
 	private Random rand;
 	
 	public Game(){
@@ -86,7 +88,6 @@ public class Game {
 		
 		ArrayList<Vertex> vertices = new ArrayList<Vertex>(); // List of vertices
 
-	
 		vertices.add(new Vertex(0, src));
 	
 		// Get a verticies list from the field data
@@ -97,9 +98,9 @@ public class Game {
 				}		
 			}
 		}
+		
 		ArrayList<Vertex> allVerticies = new ArrayList<Vertex>(vertices); // List of vertices
 	
-		
 		while(!vertices.isEmpty()){ // As long as there are vertices 
 			final Vertex u = findNearestVertex(vertices);	
 			vertices.remove(u);	// Remove u from the set of vertices
@@ -134,7 +135,7 @@ public class Game {
 	}
 	
 	public boolean doUndo(){
-		return false;		
+		return false;	
 	}
 	
 	public boolean doFreeMove(Point src, Point dst){
@@ -149,6 +150,9 @@ public class Game {
 		
 		field[dst.x][dst.y] = field[src.x][src.y];
 		field[src.x][src.y] = 0;
+		
+		freeMoves--;
+		
 		nextStep(dst); //cleanup rows or add new blocks
 		
 		return true;
@@ -157,11 +161,11 @@ public class Game {
 	}
 	
 	public int getAvailFreeMoves(){
-		return 0;
+		return freeMoves;
 	}
 	
 	public int getAvailUndo(){
-		return 0;
+		return numUndos;
 	}
 	
 	public void reset(){
@@ -175,6 +179,8 @@ public class Game {
 		field = new int[size][size];
 		level = 1;
 		score = 0;
+		numUndos = 0;
+		freeMoves = 0;
 		
 		// Populate game field
 		this.populateField();
@@ -212,6 +218,13 @@ public class Game {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param vertices
+	 * @param src
+	 * @param dst
+	 * @return
+	 */
 	private List<Point> reconstructShortestPath(final List<Vertex> vertices, final Point src, final Point dst) {
 		ArrayList<Point> path = new ArrayList<Point>();
 		path.add(dst);
@@ -230,18 +243,33 @@ public class Game {
 	}
 	/**
 	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
+	 *
+	 * @author 
+	 * @param lastPoint
 	 */
 	private void nextStep(final Point lastPoint) {
+		if(!checkRemoveBlocks(lastPoint)){
+			populateField(); //add new blocks	
+		}
+	}
+	
+	/**
+	 * Collision detection and block removal if there are 4 or more blocks in a row in any direction.
+	 * 
+	 * @author 
+	 * @param lastPoint
+	 */
+	private boolean checkRemoveBlocks(final Point lastPoint){
 		
 		final Point[] offsets = { 
-				new Point(0,1),		// ->
-				new Point(0,-1),	// <-
-				new Point(1,0),		// v
-				new Point(-1,0),	// ^
-				new Point(1,1),     // \.
-				new Point(-1,-1),	// '\
-				new Point(-1,1),	// ./
-				new Point(1,-1)		// /'
+				new Point(0,1),	 // right
+				new Point(0,-1), // left
+				new Point(1,0),	 // bottom
+				new Point(-1,0), // top
+				new Point(1,1),  // bottom right
+				new Point(-1,-1),// top left
+				new Point(-1,1), // bottom left
+				new Point(1,-1)  // top right
 		};
 		
 		int matches[] = new int[8];
@@ -264,12 +292,12 @@ public class Game {
 			matches[i] = matchcount;
 		}
 		
-		boolean matched = false;
+		int distinctmatches = 0;
 		
 		for(int i = 0; i < 4; i++){
 			int totalmatches = 1 + matches[i*2] + matches[i*2+1];
 			if(totalmatches >= 4){
-				matched = true;
+				distinctmatches++;
 				for(int j = 0; j < 2; j++){
 					Point offset = offsets[j+i*2];
 					Point current = new Point(lastPoint);
@@ -283,12 +311,19 @@ public class Game {
 			}
 		}
 		
-		if(!matched){
-			populateField(); //add new blocks	
-		}else{
+		if(distinctmatches > 0){
 			field[lastPoint.x][lastPoint.y] = 0;
 			freeBlocks++;
+			
+			if(distinctmatches < 1){
+				freeMoves++;
+			}
+			
+			return true;
 		}
+		
+		return false;
+	
 	}
 	
 	/**
@@ -306,6 +341,7 @@ public class Game {
 			if(field[x][y] == 0){
 				field[x][y] = nextBlocks.remove(0); // fill with the first element of nextBlocks
 				freeBlocks--;
+				checkRemoveBlocks(new Point(x,y));
 			}
 		}
 		
