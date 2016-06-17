@@ -54,8 +54,10 @@ public class Window extends JFrame {
 		moves.setPreferredSize(new Dimension(200, 40));
 	
 
-		buttonFreeMove= new JButton("FreeMove");
-		buttonUndo = new JButton("Undo");
+		buttonFreeMove= new JButton("Free Move (0)");
+		buttonFreeMove.setEnabled(false);
+		buttonUndo = new JButton("Undo (0)");
+		buttonUndo.setEnabled(false);
 		labelScore= new JLabel("Score: 0");
 		
 		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -70,6 +72,10 @@ public class Window extends JFrame {
 			@Override
 			public void gameUpdate() {
 				labelScore.setText("Score: "+game.getScore());
+				buttonFreeMove.setEnabled(game.getAvailFreeMoves()>0);
+				buttonUndo.setEnabled(game.getAvailUndo()>0);
+				buttonFreeMove.setText("Free Move ("+game.getAvailFreeMoves()+")");
+				buttonUndo.setText("Undo ("+game.getAvailUndo()+")");
 				
 			}
 		});

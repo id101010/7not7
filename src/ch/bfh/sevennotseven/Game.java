@@ -394,7 +394,7 @@ public class Game {
 			field[lastPoint.x][lastPoint.y] = 0;
 			freeBlocks++;
 			
-			if(distinctmatches < 1){
+			if(distinctmatches > 1){
 				freeMoves++;
 			}
 			

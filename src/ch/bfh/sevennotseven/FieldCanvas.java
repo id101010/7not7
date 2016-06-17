@@ -69,9 +69,9 @@ public class FieldCanvas extends JPanel{
 				if(dst != null && src!=null && !src.equals(dst)) {
 					System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
 					game.doMove(src, dst);
-					repaint();
 				}
 				src = null;
+				repaint();
 			}
 		};
 		
