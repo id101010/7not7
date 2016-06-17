@@ -11,7 +11,10 @@ import javax.swing.JPanel;
 
 public class FieldCanvas extends JPanel{
 	private static final long serialVersionUID = 1L;
-	static final int border = 5;
+	static final int borderLeft = 5;
+	static final int borderRight = 5;
+	static final int borderTop = 100;
+	static final int borderBottom = 5;
 	static final Color[] colors = {Color.red,Color.green, Color.blue, Color.yellow,Color.magenta};
 	
 	
@@ -29,7 +32,7 @@ public class FieldCanvas extends JPanel{
 				super.mousePressed(e);
 				
 				Point p = FieldCanvas.this.getClickPoint(e.getPoint());
-				if(p==null) { //invalid click
+				if(p==null || game.getField()[p.x][p.y]==0) { //invalid click
 					src = null;
 				} else {
 					src = p;
@@ -57,7 +60,7 @@ public class FieldCanvas extends JPanel{
 				super.mouseReleased(e);
 				dst = FieldCanvas.this.getClickPoint(e.getPoint());
 				path = null;
-				if(dst != null && src!=null) {
+				if(dst != null && src!=null && !src.equals(dst)) {
 					System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
 					game.doMove(src, dst);
 					repaint();
@@ -72,10 +75,10 @@ public class FieldCanvas extends JPanel{
 	}
 	
 	private Point getClickPoint(Point globalPos) {
-		int total = Math.min(this.getHeight(),FieldCanvas.this.getWidth())-2*border;
+		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
 		int space = total/size;
 
-		globalPos.translate(-border, -border);
+		globalPos.translate(-borderLeft, -borderTop);
 		if(globalPos.x<0 || globalPos.x >total  || globalPos.y < 0 || globalPos.y > total) return null;
 		return new Point(globalPos.x/space,globalPos.y/space);	
 	}
@@ -89,16 +92,28 @@ public class FieldCanvas extends JPanel{
 	}
 	
 	
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.setColor(Color.lightGray);
 		
-		g.translate(border, border);
-		int total = Math.min(this.getHeight(),this.getWidth())-2*border;
+		List<Integer> nextBlocks = game.getNextBlocks();
+		for(int i=0; i< nextBlocks.size(); i++) {
+			g.setColor(colors[nextBlocks.get(i)-1]);
+			g.fillRect(borderLeft + borderTop/2 *i, borderTop/4, borderTop/2, borderTop/2);
+			g.setColor(Color.white);
+			g.drawRect(borderLeft + borderTop/2 *i, borderTop/4, borderTop/2, borderTop/2);
+		}
+		
+		g.setColor(Color.lightGray);
+		
+		
+		g.translate(borderLeft, borderTop);
+		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
 		int space = total/size;
 		
-		g.setClip(0, 0, total-1,total-1);
-		g.fillRect(0, 0, total-1,total-1);
+		g.setClip(0, 0, total-4,total-4);
+		g.fillRect(0, 0, total-4,total-4);
 		
 		g.setColor(Color.white);
 	

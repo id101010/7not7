@@ -63,13 +63,12 @@ public class Game {
 	}
 	
 	public boolean doMove(Point src, Point dst){
+		if(field[src.x][src.y]==0 ||field[dst.x][dst.y] !=0 || src.equals(dst)) {
+			return false;
+		}
 		
 		if(!canMove(src, dst)) {
 			return false; //checking if there is a path from src to dest
-		}
-		
-		if(field[src.x][src.y]==0) {
-			return false;
 		}
 		
 		field[dst.x][dst.y] = field[src.x][src.y];
