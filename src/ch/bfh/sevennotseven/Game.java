@@ -25,6 +25,12 @@ public class Game {
 		this(7);
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @author aaron
+	 * @param size
+	 */
 	public Game (int size) {
 		/* Initialize variables */
 		this.size = size;
@@ -64,6 +70,14 @@ public class Game {
 		
 	}
 	
+	/**
+	 * Check if there is a valid path from src to dst and move a block if possible.
+	 * 
+	 * @author aaron
+	 * @param src
+	 * @param dst
+	 * @return
+	 */
 	public boolean doMove(Point src, Point dst){
 		if(field[src.x][src.y]==0 ||field[dst.x][dst.y] !=0 || src.equals(dst)) {
 			return false;
@@ -82,7 +96,12 @@ public class Game {
 	}
 	
 	/**
-	 *  Pathfinding of shortest path between src and dst.
+	 * Pathfinding of shortest path between src and dst.
+	 * 
+	 * @author aaron
+	 * @param src
+	 * @param dst
+	 * @return
 	 */
 	public List<Point> getPath(final Point src, final Point dst){
 		
@@ -138,6 +157,14 @@ public class Game {
 		return false;	
 	}
 	
+	/**
+	 * Do a free move if freeMoves < 0.
+	 * 
+	 * @author aaron
+	 * @param src
+	 * @param dst
+	 * @return
+	 */
 	public boolean doFreeMove(Point src, Point dst){
 		//move without path checking
 		if(getAvailFreeMoves() <= 0 ) {
@@ -168,6 +195,11 @@ public class Game {
 		return numUndos;
 	}
 	
+	/**
+	 * Reset game score, field and state.
+	 * 
+	 * @author aaron
+	 */
 	public void reset(){
 		// Initialize new blocks
 		nextBlocks = new ArrayList<Integer>();
@@ -188,6 +220,10 @@ public class Game {
 	
 	/**
 	 * Finds the nearest vertex to start
+	 * 
+	 * @author aaron
+	 * @param vertices
+	 * @return
 	 */
 	private Vertex findNearestVertex(final List<Vertex> vertices){
 		Vertex tmp = vertices.get(0);
@@ -203,11 +239,28 @@ public class Game {
 		return tmp;
 	}
 	
+	/**
+	 * Helper function for pathfinding. Finds a vertex corresponding to the given coordinate.
+	 * 
+	 * @author aaron
+	 * @param x
+	 * @param y
+	 * @param vertices
+	 * @return
+	 */
 	private Vertex findVertex(int x, int y, final List<Vertex> vertices) {
 		return findVertex(new Point(x,y), vertices);
 
 	}
 
+	/**
+	 * Helper function for pathfinding. Finds a vertex corresponding to the given point.
+	 * 
+	 * @author aaron
+	 * @param pos
+	 * @param vertices
+	 * @return
+	 */
 	private Vertex findVertex(final Point pos, final List<Vertex> vertices) {
 		for (int i = 0; i < vertices.size(); i++) {
 			Vertex n = vertices.get(i);
@@ -219,7 +272,9 @@ public class Game {
 	}
 	
 	/**
+	 * Helper function for pathfinding. Returns shortest path between src and dst in a given set of vertices.
 	 * 
+	 * @author aaron
 	 * @param vertices
 	 * @param src
 	 * @param dst
@@ -244,7 +299,7 @@ public class Game {
 	/**
 	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
 	 *
-	 * @author 
+	 * @author aaron
 	 * @param lastPoint
 	 */
 	private void nextStep(final Point lastPoint) {
@@ -256,7 +311,7 @@ public class Game {
 	/**
 	 * Collision detection and block removal if there are 4 or more blocks in a row in any direction.
 	 * 
-	 * @author 
+	 * @author aaron
 	 * @param lastPoint
 	 */
 	private boolean checkRemoveBlocks(final Point lastPoint){
@@ -318,6 +373,14 @@ public class Game {
 			if(distinctmatches < 1){
 				freeMoves++;
 			}
+			
+			int sum = 0;
+			
+			for( Integer i : matches ) sum += i;
+			
+			score += (1 + distinctmatches * sum);
+			
+			System.out.println("Score: " + score);
 			
 			return true;
 		}
