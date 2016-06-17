@@ -13,10 +13,10 @@ public class FieldCanvas extends JPanel{
 	private static final long serialVersionUID = 1L;
 	static final int borderLeft = 5;
 	static final int borderRight = 5;
-	static final int borderTop = 100;
+	static final int borderTop = 5;
 	static final int borderBottom = 5;
 	
-	static final Color[] colors = { 
+	public static final Color[] colors = { 
 			new Color(0xD66436),
 			new Color(0x486F70),
 			new Color(0xCBD840),
@@ -25,14 +25,13 @@ public class FieldCanvas extends JPanel{
 	};
 	
 	
-	
 	private int size;
 	private Game game;
 	private Point src;
 	private Point dst;
 	private List<Point> path;
 	
-	FieldCanvas(){
+	FieldCanvas(Game g){
 		MouseAdapter ad = new MouseAdapter(){
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -78,6 +77,8 @@ public class FieldCanvas extends JPanel{
 		
 		addMouseListener(ad);
 		addMouseMotionListener(ad);
+		this.game=g;
+		this.size = game.getSize();
 
 	}
 	
@@ -90,28 +91,12 @@ public class FieldCanvas extends JPanel{
 		return new Point(globalPos.x/space,globalPos.y/space);	
 	}
 	
-	public void setGame(Game game) {
-		this.game=game;
-	}
-	
-	public void setSize(int s) {
-		this.size = s;
-	}
 	
 	
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		g.setColor(Color.lightGray);
-		
-		List<Integer> nextBlocks = game.getNextBlocks();
-		for(int i=0; i< nextBlocks.size(); i++) {
-			g.setColor(colors[nextBlocks.get(i)-1]);
-			g.fillRect(borderLeft + borderTop/2 *i, borderTop/4, borderTop/2, borderTop/2);
-			g.setColor(Color.white);
-			g.drawRect(borderLeft + borderTop/2 *i, borderTop/4, borderTop/2, borderTop/2);
-		}
-		
+
 		g.setColor(Color.lightGray);
 		
 		

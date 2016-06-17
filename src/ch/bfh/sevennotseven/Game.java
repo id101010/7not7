@@ -7,6 +7,11 @@ import java.util.Random;
 
 public class Game {
 	
+	interface UpdateListener  {
+		public void gameUpdate();
+	}
+	
+	
 	// Constants
 	static final int numberOfColors = 5;
 	
@@ -20,6 +25,7 @@ public class Game {
 	private int freeMoves;
 	private int numUndos;
 	private Random rand;
+	private ArrayList<UpdateListener> updateListeners;
 	
 	public Game(){
 		this(7);
@@ -31,14 +37,31 @@ public class Game {
 		this.level = 1;
 		this.score = 0;
 		this.freeBlocks = size * size;
+		this.updateListeners = new ArrayList<UpdateListener>();
 		
 		rand = new Random(); // Initialize random object
 		this.reset();
 	}
 	
+	public void addUpdateListener(UpdateListener listener) {
+		updateListeners.add(listener);
+	}
+	public void removeUpdateListener(UpdateListener listener) {
+		updateListeners.remove(listener);
+	}
+	private void emitUpdateEvent() {
+		for(UpdateListener e: updateListeners) {
+			e.gameUpdate();
+		}
+	}
+	
 	public boolean isGameOver(){
 		return false;
 	
+	}
+	
+	public int getSize() {
+		return size;
 	}
 	
 	public int getScore(){
@@ -251,6 +274,7 @@ public class Game {
 		if(!checkRemoveBlocks(lastPoint)){
 			populateField(); //add new blocks	
 		}
+		emitUpdateEvent();
 	}
 	
 	/**
