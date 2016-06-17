@@ -15,7 +15,14 @@ public class FieldCanvas extends JPanel{
 	static final int borderRight = 5;
 	static final int borderTop = 100;
 	static final int borderBottom = 5;
-	static final Color[] colors = {Color.red,Color.green, Color.blue, Color.yellow,Color.magenta};
+	
+	static final Color[] colors = { 
+			new Color(0xD66436),
+			new Color(0x486F70),
+			new Color(0xCBD840),
+			new Color(0x8B2700),
+			new Color(0x33CCCC)
+	};
 	
 	
 	

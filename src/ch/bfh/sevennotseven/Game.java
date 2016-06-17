@@ -68,23 +68,23 @@ public class Game {
 		}
 		
 		if(!canMove(src, dst)) {
-			return false; //checking if there is a path from src to dest
+			return false; // checking if there is a path from src to dest
 		}
 		
 		field[dst.x][dst.y] = field[src.x][src.y];
 		field[src.x][src.y] = 0;
 		
-		nextStep(dst); //cleanup rows or add new blocks
+		nextStep(dst); // cleanup rows or add new blocks
 		
 		return true;
 	}
 	
-	/*
+	/**
 	 *  Pathfinding of shortest path between src and dst.
 	 */
 	public List<Point> getPath(final Point src, final Point dst){
 		
-		ArrayList<Vertex> vertices = new ArrayList<Vertex>();	// List of vertices
+		ArrayList<Vertex> vertices = new ArrayList<Vertex>(); // List of vertices
 
 	
 		vertices.add(new Vertex(0, src));
@@ -97,19 +97,19 @@ public class Game {
 				}		
 			}
 		}
-		ArrayList<Vertex> allVerticies = new ArrayList<Vertex>(vertices);	// List of vertices
+		ArrayList<Vertex> allVerticies = new ArrayList<Vertex>(vertices); // List of vertices
 	
 		
-		while(!vertices.isEmpty()){ 			// As long as there are vertices 
+		while(!vertices.isEmpty()){ // As long as there are vertices 
 			final Vertex u = findNearestVertex(vertices);	
-			vertices.remove(u);				// Remove u from the set of vertices
+			vertices.remove(u);	// Remove u from the set of vertices
 			
 			final Point[] offsets = { 
 				new Point(0,1),
 				new Point(0,-1),
 				new Point(1,0),
 				new Point(-1,0)
-				};
+			};
 			
 			for(int i = 0; i < 4; i++){	// for each neighbour of u ...
 				final Point p = u.getPos();
@@ -128,7 +128,6 @@ public class Game {
 					}
 				}
 			}
-			
 		}
 
 		return reconstructShortestPath(allVerticies, src,dst);
@@ -232,16 +231,67 @@ public class Game {
 	/**
 	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
 	 */
-	private void nextStep(Point lastPoint) {
-		//TODO: Check if there are any new rows (with at least 4 elements horizontally, vertically, or diagonal) near lastpoint
-		//TODO:  if so: remove the row, add some points or extras and quit
-		//TODO:  if not: 
-		populateField(); //add new blocks
+	private void nextStep(final Point lastPoint) {
 		
+		final Point[] offsets = { 
+				new Point(0,1),		// ->
+				new Point(0,-1),	// <-
+				new Point(1,0),		// v
+				new Point(-1,0),	// ^
+				new Point(1,1),     // \.
+				new Point(-1,-1),	// '\
+				new Point(-1,1),	// ./
+				new Point(1,-1)		// /'
+		};
+		
+		int matches[] = new int[8];
+		int color = field[lastPoint.x][lastPoint.y];
+		
+		for(int i = 0; i < 8; i++){
+			Point offset = offsets[i];
+			Point current = new Point(lastPoint);
+			
+			int matchcount = 0;
+
+			
+			while(true){
+				current.translate(offset.x, offset.y);
+				if(current.x < 0 || current.x >= size || current.y < 0 || current.y >= size) break;
+				if(field[current.x][current.y] != color) break;
+				matchcount++;
+			}
+			
+			matches[i] = matchcount;
+		}
+		
+		boolean matched = false;
+		
+		for(int i = 0; i < 4; i++){
+			int totalmatches = 1 + matches[i*2] + matches[i*2+1];
+			if(totalmatches >= 4){
+				matched = true;
+				for(int j = 0; j < 2; j++){
+					Point offset = offsets[j+i*2];
+					Point current = new Point(lastPoint);
+
+					for(int k = 0; k < matches[j+i*2]; k++){
+						current.translate(offset.x, offset.y);
+						field[current.x][current.y] = 0;
+						freeBlocks++;
+					}
+				}
+			}
+		}
+		
+		if(!matched){
+			populateField(); //add new blocks	
+		}else{
+			field[lastPoint.x][lastPoint.y] = 0;
+			freeBlocks++;
+		}
 	}
 	
-	/*
-
+	/**
 	 * Adds n new blocks to random positions on the field, 
 	 * according to the level number.
 	 */
