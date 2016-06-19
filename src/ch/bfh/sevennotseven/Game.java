@@ -15,6 +15,7 @@ public class Game {
 	// Constants
 	static final int numberOfColors = 5;
 	static final int linesPerLevel = 40;
+	static final int blocksPerLevel []= {3,4,5}; 
 	
 	// Private members
 	private int[][] field;
@@ -336,6 +337,7 @@ public class Game {
 			linesLeft--;
 			if(linesLeft==0) {
 				level++;
+				numUndos++;
 				linesLeft=linesPerLevel;
 			
 			}
@@ -443,8 +445,15 @@ public class Game {
 			}
 		}
 		
+		int blocksToAdd = 0;
+		if(level <= blocksPerLevel.length) {
+			blocksToAdd = blocksPerLevel[level-1];
+		} else {
+			blocksToAdd = blocksPerLevel[blocksPerLevel.length-1];
+		}
+		
 		// add n new colors to nextBlocks according to the level number.
-		for(int i = 0; i < (level * 3); i++){
+		for(int i = 0; i < blocksToAdd; i++){
 			nextBlocks.add(1 + rand.nextInt(numberOfColors));	
 		}
 	}
