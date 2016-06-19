@@ -41,6 +41,7 @@ public class Game {
 	 */
 	public Game (int size) {		
 		rand = new Random(); // Initialize random object
+		this.updateListeners = new ArrayList<UpdateListener>();
 		this.reset(size);
 	}
 	
@@ -225,7 +226,6 @@ public class Game {
 	public void reset(int size){
 		this.size = size;
 		this.freeBlocks = size * size;
-		this.updateListeners = new ArrayList<UpdateListener>();
 		
 		// Initialize new blocks
 		nextBlocks = new ArrayList<Integer>();

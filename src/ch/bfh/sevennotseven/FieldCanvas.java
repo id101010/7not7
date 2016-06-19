@@ -16,6 +16,7 @@ public class FieldCanvas extends JPanel{
 	static final int borderTop = 5;
 	static final int borderBottom = 5;
 	
+	
 	public static final Color[] colors = { 
 			new Color(0xD66436),
 			new Color(0x486F70),
@@ -29,6 +30,7 @@ public class FieldCanvas extends JPanel{
 	private Point src;
 	private Point dst;
 	private List<Point> path;
+	private boolean freeMoveMode = false;
 	
 	FieldCanvas(Game g){
 		MouseAdapter ad = new MouseAdapter(){
@@ -65,10 +67,15 @@ public class FieldCanvas extends JPanel{
 				super.mouseReleased(e);
 				dst = FieldCanvas.this.getClickPoint(e.getPoint());
 				path = null;
-				if(dst != null && src!=null && !src.equals(dst)) {
-					System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
-					game.doMove(src, dst);
+				if(freeMoveMode && !game.canMove(src, dst)) {
+					game.doFreeMove(src, dst);
+				} else {
+					if(dst != null && src!=null && !src.equals(dst)) {
+						System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
+						game.doMove(src, dst);
+					}
 				}
+				freeMoveMode = false;
 				src = null;
 				repaint();
 			}
@@ -78,6 +85,18 @@ public class FieldCanvas extends JPanel{
 		addMouseMotionListener(ad);
 		this.game=g;
 
+	}
+	
+	public void doFreeMove() {
+		if(game.getAvailFreeMoves()>0) {
+			freeMoveMode = true;
+		}
+	}
+	
+	public void doUndo() {
+		if(game.getAvailUndo()>0) {
+			game.doUndo();
+		}
 	}
 	
 	private Point getClickPoint(Point globalPos) {

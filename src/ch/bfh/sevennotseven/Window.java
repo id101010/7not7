@@ -63,8 +63,12 @@ public class Window  extends JFrame implements ActionListener{
 
 		buttonFreeMove= new JButton("Free Move (0)");
 		buttonFreeMove.setEnabled(false);
+		buttonFreeMove.addActionListener(this);
+		buttonFreeMove.setActionCommand("freemove");
 		buttonUndo = new JButton("Undo (0)");
 		buttonUndo.setEnabled(false);
+		buttonUndo.addActionListener(this);
+		buttonUndo.setActionCommand("undo");
 		labelScore= new JLabel("Score: 0");
 		labelLinesLeft = new JLabel("Lines Left: 40");
 		labelLevel = new JLabel("Level: 1");
@@ -125,9 +129,16 @@ public class Window  extends JFrame implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int size = Integer.parseInt(e.getActionCommand());
-		cardLayout.last(mainPanel);
-		game.reset(size);
+		String command = e.getActionCommand();
+		if(command.equals("undo")) {
+			field.doUndo();
+		} else if (command.equals("freemove")) {
+			field.doFreeMove();
+		} else {
+			int size = Integer.parseInt(command);
+			cardLayout.last(mainPanel);
+			game.reset(size);
+		}
 			
 	}
 
