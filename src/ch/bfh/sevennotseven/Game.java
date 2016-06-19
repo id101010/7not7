@@ -14,6 +14,7 @@ public class Game {
 	
 	// Constants
 	static final int numberOfColors = 5;
+	static final int linesPerLevel = 40;
 	
 	// Private members
 	private int[][] field;
@@ -24,6 +25,7 @@ public class Game {
 	private int freeBlocks;
 	private int freeMoves;
 	private int numUndos;
+	private int linesLeft;
 	private Random rand;
 	private ArrayList<UpdateListener> updateListeners;
 	
@@ -37,16 +39,9 @@ public class Game {
 	 * @author aaron
 	 * @param size
 	 */
-	public Game (int size) {
-		/* Initialize variables */
-		this.size = size;
-		this.level = 1;
-		this.score = 0;
-		this.freeBlocks = size * size;
-		this.updateListeners = new ArrayList<UpdateListener>();
-		
+	public Game (int size) {		
 		rand = new Random(); // Initialize random object
-		this.reset();
+		this.reset(size);
 	}
 	
 	public void addUpdateListener(UpdateListener listener) {
@@ -73,6 +68,10 @@ public class Game {
 	public int getScore(){
 		return score;
 	
+	}
+	
+	public int getLinesLeft() {
+		return linesLeft;
 	}
 	
 	public int getLevel(){
@@ -223,7 +222,11 @@ public class Game {
 	 * 
 	 * @author aaron
 	 */
-	public void reset(){
+	public void reset(int size){
+		this.size = size;
+		this.freeBlocks = size * size;
+		this.updateListeners = new ArrayList<UpdateListener>();
+		
 		// Initialize new blocks
 		nextBlocks = new ArrayList<Integer>();
 		nextBlocks.add(1);
@@ -236,6 +239,7 @@ public class Game {
 		score = 0;
 		numUndos = 0;
 		freeMoves = 0;
+		linesLeft=linesPerLevel;
 		
 		// Populate game field
 		this.populateField();
@@ -328,6 +332,13 @@ public class Game {
 	private void nextStep(final Point lastPoint) {
 		if(!checkRemoveBlocks(lastPoint)){
 			populateField(); //add new blocks	
+		} else {
+			linesLeft--;
+			if(linesLeft==0) {
+				level++;
+				linesLeft=linesPerLevel;
+			
+			}
 		}
 		emitUpdateEvent();
 	}

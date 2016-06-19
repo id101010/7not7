@@ -25,7 +25,6 @@ public class FieldCanvas extends JPanel{
 	};
 	
 	
-	private int size;
 	private Game game;
 	private Point src;
 	private Point dst;
@@ -78,13 +77,12 @@ public class FieldCanvas extends JPanel{
 		addMouseListener(ad);
 		addMouseMotionListener(ad);
 		this.game=g;
-		this.size = game.getSize();
 
 	}
 	
 	private Point getClickPoint(Point globalPos) {
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
-		int space = total/size;
+		int space = total/game.getSize();
 
 		globalPos.translate(-borderLeft, -borderTop);
 		if(globalPos.x<0 || globalPos.x >total  || globalPos.y < 0 || globalPos.y > total) return null;
@@ -102,22 +100,22 @@ public class FieldCanvas extends JPanel{
 		
 		g.translate(borderLeft, borderTop);
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
-		int space = total/size;
+		int space = total/game.getSize();
 		
 		g.setClip(0, 0, total-4,total-4);
 		g.fillRect(0, 0, total-4,total-4);
 		
 		g.setColor(Color.white);
 	
-		for(int i=0; i<=size; i++) {
+		for(int i=0; i<=game.getSize(); i++) {
 			g.drawLine(0,i*space,total-2,i*space);
 			g.drawLine(i*space,0,i*space,total-2);
 		}
 	
 		if(game==null) return;
 		
-		for(int x=0; x<size; x++) {
-			for(int y=0; y<size; y++) {
+		for(int x=0; x<game.getSize(); x++) {
+			for(int y=0; y<game.getSize(); y++) {
 				int colorCode = game.getField()[x][y];
 				if(colorCode!=0) {
 					g.setColor(colors[colorCode-1]);

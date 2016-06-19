@@ -5,11 +5,14 @@ package ch.bfh.sevennotseven;
 
 import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.HeadlessException;
 import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -24,7 +27,7 @@ import javax.swing.JPanel;
  * @author aaron
  *
  */
-public class Window extends JFrame {
+public class Window  extends JFrame implements ActionListener{
 	
 	private static final long serialVersionUID = 1L;
 	private Game game;
@@ -34,6 +37,10 @@ public class Window extends JFrame {
 	private JButton buttonUndo;
 	private JButton buttonFreeMove;
 	private JLabel labelScore;
+	private JLabel labelLinesLeft;	
+	private JLabel labelLevel;
+	private JPanel mainPanel;
+	private CardLayout cardLayout;
 
 
 	public Window(String title) throws HeadlessException {
@@ -59,12 +66,16 @@ public class Window extends JFrame {
 		buttonUndo = new JButton("Undo (0)");
 		buttonUndo.setEnabled(false);
 		labelScore= new JLabel("Score: 0");
+		labelLinesLeft = new JLabel("Lines Left: 40");
+		labelLevel = new JLabel("Level: 1");
 		
 		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 		topPanel.add(buttonFreeMove);
 		topPanel.add(buttonUndo);
 		topPanel.add(labelScore);
+		topPanel.add(labelLinesLeft);
+		topPanel.add(labelLevel);
 		topPanel.add(moves);
 		
 		game.addUpdateListener(new Game.UpdateListener() {
@@ -76,19 +87,48 @@ public class Window extends JFrame {
 				buttonUndo.setEnabled(game.getAvailUndo()>0);
 				buttonFreeMove.setText("Free Move ("+game.getAvailFreeMoves()+")");
 				buttonUndo.setText("Undo ("+game.getAvailUndo()+")");
+				labelLinesLeft.setText("Lines Left: "+game.getLinesLeft());
+				labelLevel.setText("Level: "+game.getLevel());
 				
 			}
 		});
 		
-
+		JPanel welcomePanel = new JPanel();
+		int sizes [] = {7,8,9,10};
+		for(int i=0; i<sizes.length; i++) {
+			JButton btn = new JButton(sizes[i]+"x"+sizes[i]);
+			btn.addActionListener(this);
+			btn.setActionCommand(Integer.toString(sizes[i]));
+			welcomePanel.add(btn);
+		}
 		
-		this.add(topPanel, BorderLayout.NORTH);
-		this.add(field);
+		
+		JPanel gamePanel = new JPanel();
+		gamePanel.setLayout(new BorderLayout());
+		gamePanel.add(topPanel, BorderLayout.NORTH);
+		gamePanel.add(field);
+		
+		mainPanel = new JPanel();
+		cardLayout = new CardLayout();
+		mainPanel.setLayout(cardLayout);
+		mainPanel.add(welcomePanel);
+		mainPanel.add(gamePanel);
+		
+		this.setContentPane(mainPanel);
+		
 		this.setSize(470,460);
 		this.setVisible(true);
 		
 
 
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		int size = Integer.parseInt(e.getActionCommand());
+		cardLayout.last(mainPanel);
+		game.reset(size);
+			
 	}
 
 	/**
