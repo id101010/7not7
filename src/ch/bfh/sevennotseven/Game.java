@@ -11,7 +11,6 @@ public class Game {
 		public void gameUpdate();
 	}
 	
-	
 	// Constants
 	static final int numberOfColors = 5;
 	static final int linesPerLevel = 40;
@@ -46,24 +45,20 @@ public class Game {
 		this.reset(size);
 	}
 	
-	public void addUpdateListener(UpdateListener listener) {
-		updateListeners.add(listener);
-	}
-	public void removeUpdateListener(UpdateListener listener) {
-		updateListeners.remove(listener);
-	}
-	private void emitUpdateEvent() {
-		for(UpdateListener e: updateListeners) {
-			e.gameUpdate();
-		}
-	}
-	
 	public boolean isGameOver(){
 		return false;
 	
 	}
 	
-	public int getSize() {
+	public int getAvailFreeMoves(){
+		return freeMoves;
+	}
+	
+	public int getAvailUndo(){
+		return numUndos;
+	}
+	
+	public int getSize(){
 		return size;
 	}
 	
@@ -72,7 +67,7 @@ public class Game {
 	
 	}
 	
-	public int getLinesLeft() {
+	public int getLinesLeft(){
 		return linesLeft;
 	}
 	
@@ -95,12 +90,43 @@ public class Game {
 	}
 	
 	/**
+	 * Adds an update listener to the game object.
+	 * 
+	 * @author aaron
+	 * @param listener
+	 */
+	public void addUpdateListener(UpdateListener listener){
+		updateListeners.add(listener);
+	}
+	
+	/**
+	 * Removes the update listener from the game object.
+	 * 
+	 * @author aaron
+	 * @param listener
+	 */
+	public void removeUpdateListener(UpdateListener listener){
+		updateListeners.remove(listener);
+	}
+	
+	/**
+	 * Updatelistener callback, updates game when a listener gets triggered.
+	 * 
+	 * @author aaron
+	 */
+	private void emitUpdateEvent(){
+		for(UpdateListener e: updateListeners) {
+			e.gameUpdate();
+		}
+	}
+	
+	/**
 	 * Check if there is a valid path from src to dst and move a block if possible.
 	 * 
 	 * @author aaron
 	 * @param src
 	 * @param dst
-	 * @return
+	 * @return True if a move from src to dst is possible.
 	 */
 	public boolean doMove(Point src, Point dst){
 		if(field[src.x][src.y]==0 ||field[dst.x][dst.y] !=0 || src.equals(dst)) {
@@ -125,7 +151,7 @@ public class Game {
 	 * @author aaron
 	 * @param src
 	 * @param dst
-	 * @return
+	 * @return Shortest path between src and dst.
 	 */
 	public List<Point> getPath(final Point src, final Point dst){
 		
@@ -187,7 +213,7 @@ public class Game {
 	 * @author aaron
 	 * @param src
 	 * @param dst
-	 * @return
+	 * @return True if freemove is posible.
 	 */
 	public boolean doFreeMove(Point src, Point dst){
 		//move without path checking
@@ -207,16 +233,6 @@ public class Game {
 		nextStep(dst); //cleanup rows or add new blocks
 		
 		return true;
-		
-		
-	}
-	
-	public int getAvailFreeMoves(){
-		return freeMoves;
-	}
-	
-	public int getAvailUndo(){
-		return numUndos;
 	}
 	
 	/**
@@ -251,7 +267,7 @@ public class Game {
 	 * 
 	 * @author aaron
 	 * @param vertices
-	 * @return
+	 * @return Nearest vertex to the fist element of the given vertices list.
 	 */
 	private Vertex findNearestVertex(final List<Vertex> vertices){
 		Vertex tmp = vertices.get(0);
@@ -260,7 +276,6 @@ public class Game {
 			Vertex n = vertices.get(i);
 			if(n.getDist() < tmp.getDist()) {
 				tmp = n;
-						
 			}
 		}
 		
@@ -274,11 +289,10 @@ public class Game {
 	 * @param x
 	 * @param y
 	 * @param vertices
-	 * @return
+	 * @return Vertex with the given position out of a list of vertices.
 	 */
-	private Vertex findVertex(int x, int y, final List<Vertex> vertices) {
+	private Vertex findVertex(int x, int y, final List<Vertex> vertices){
 		return findVertex(new Point(x,y), vertices);
-
 	}
 
 	/**
@@ -287,9 +301,9 @@ public class Game {
 	 * @author aaron
 	 * @param pos
 	 * @param vertices
-	 * @return
+	 * @return Vertex with the given position out of a list of vertices.
 	 */
-	private Vertex findVertex(final Point pos, final List<Vertex> vertices) {
+	private Vertex findVertex(final Point pos, final List<Vertex> vertices){
 		for (int i = 0; i < vertices.size(); i++) {
 			Vertex n = vertices.get(i);
 			if(n.getPos().equals(pos)) {
@@ -306,20 +320,20 @@ public class Game {
 	 * @param vertices
 	 * @param src
 	 * @param dst
-	 * @return
+	 * @return Shortest path between two given points in a list of vertices.
 	 */
-	private List<Point> reconstructShortestPath(final List<Vertex> vertices, final Point src, final Point dst) {
+	private List<Point> reconstructShortestPath(final List<Vertex> vertices, final Point src, final Point dst){
 		ArrayList<Point> path = new ArrayList<Point>();
 		path.add(dst);
 		Vertex u = findVertex(dst, vertices);
 		if(u==null) {
 			return null;
 		}
-		while(u.getPrev()!=null) {
+		while(u.getPrev()!=null){
 			u= u.getPrev();
 			path.add(0, u.getPos());
 		}
-		if(u!=findVertex(src, vertices)) {
+		if(u!=findVertex(src, vertices)){
 			return null;
 		}
 		return path;
@@ -330,12 +344,12 @@ public class Game {
 	 * @author aaron
 	 * @param lastPoint
 	 */
-	private void nextStep(final Point lastPoint) {
+	private void nextStep(final Point lastPoint){
 		if(!checkRemoveBlocks(lastPoint)){
 			populateField(); //add new blocks	
 		} else {
 			linesLeft--;
-			if(linesLeft==0) {
+			if(linesLeft==0){
 				level++;
 				numUndos++;
 				linesLeft=linesPerLevel;
@@ -350,6 +364,7 @@ public class Game {
 	 * 
 	 * @author aaron
 	 * @param lastPoint
+	 * @return True if 4 or more blocks got removed.
 	 */
 	private boolean checkRemoveBlocks(final Point lastPoint){
 		
@@ -427,8 +442,9 @@ public class Game {
 	}
 	
 	/**
-	 * Adds n new blocks to random positions on the field, 
-	 * according to the level number.
+	 * Adds n new blocks to random positions on the field, according to the level number.
+	 * 
+	 * @author aaron
 	 */
 	private void populateField(){
 		
