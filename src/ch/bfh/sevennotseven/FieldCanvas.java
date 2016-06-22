@@ -96,6 +96,7 @@ public class FieldCanvas extends JPanel{
 	public void doUndo() {
 		if(game.getAvailUndo()>0) {
 			game.doUndo();
+			repaint();
 		}
 	}
 	
@@ -108,14 +109,10 @@ public class FieldCanvas extends JPanel{
 		return new Point(globalPos.x/space,globalPos.y/space);	
 	}
 	
-	
-	
-	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 		g.setColor(Color.lightGray);
-		
 		
 		g.translate(borderLeft, borderTop);
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
@@ -156,18 +153,12 @@ public class FieldCanvas extends JPanel{
 			g.setColor(c);
 			g.fillRect(src.x*space+2+sSpace2, src.y*space+2+sSpace2, space -3 - 2* sSpace2, space -3 - 2* sSpace2);
 			
-			
 			for(int i=1; i<path.size() -1; i++) {
 				Point p = path.get(i);
 				g.fillRect(p.x*space+2+sSpace, p.y*space+2+sSpace, space -3 - 2* sSpace, space -3 - 2* sSpace);
 			}
+			
 			g.fillRect(dst.x*space+2+sSpace2, dst.y*space+2+sSpace2, space -3 - 2* sSpace2, space -3 - 2* sSpace2);
-			
-			
-			
 		}
-		
 	}
-	
-	
 }

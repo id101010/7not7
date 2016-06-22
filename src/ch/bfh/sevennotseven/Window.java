@@ -147,7 +147,5 @@ public class Window  extends JFrame implements ActionListener{
 	 */
 	public static void main(String[] args) {
 		new Window("7 not 7");
-
 	}
-
 }
