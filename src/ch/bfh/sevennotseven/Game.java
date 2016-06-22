@@ -20,9 +20,7 @@ public class Game {
 	// Private members
 	private Integer[][] field;
 	private ArrayList<Integer> nextBlocks;
-	private ArrayList<Point> oldMoves;
-	private ArrayList<Point> lastNewBlocks;
-	private ArrayList<Integer> numOflastNewBlocks;
+	private ArrayList<Integer[][]> oldFields;
 	private int level;
 	private int score;
 	private int size;
@@ -141,8 +139,7 @@ public class Game {
 			return false; // checking if there is a path from src to dst
 		}
 		
-		oldMoves.add(src); // add src to the oldMove Stack
-		oldMoves.add(dst); // add dst to the oldMove Stack
+		saveStep();
 		
 		field[dst.x][dst.y] = field[src.x][src.y];
 		field[src.x][src.y] = 0;
@@ -217,19 +214,9 @@ public class Game {
 	 * @return True if undo was possible.
 	 */
 	public boolean doUndo(){
-		if(getAvailUndo() > 0 && oldMoves.size() > 0){
-			Point dst = oldMoves.remove(oldMoves.size() - 1); // pops the last dst
-			Point src = oldMoves.remove(oldMoves.size() - 1); // pops the last src
-			
-			field[src.x][src.y] = field[dst.x][dst.y]; // Undo the last move
-			field[dst.x][dst.y] = 0; // reset the undone dst to zero
-			
-			// get the number of blocks which got added last time and remove them
-			for(int n = numOflastNewBlocks.remove(numOflastNewBlocks.size() - 1); n > 0; n--){
-				Point tmp = lastNewBlocks.remove(lastNewBlocks.size() - 1);
-				field[tmp.x][tmp.y] = 0;
-			}
-			
+		if(getAvailUndo() > 0 && oldFields.size() > 0){
+
+			field= oldFields.remove(oldFields.size()-1);
 			numUndos--;
 			
 			emitUpdateEvent();
@@ -238,6 +225,15 @@ public class Game {
 		}
 		
 		return false;
+	}
+	
+	private void saveStep() {
+		Integer[][] fieldCopy = new Integer[size][size];
+		for(int i=0; i<size; i++) {
+			fieldCopy[i] = Arrays.copyOf(field[i], size);
+		}
+		
+		oldFields.add(fieldCopy);
 	}
 	
 	/**
@@ -258,13 +254,15 @@ public class Game {
 			return false;
 		}
 		
-		oldMoves.add(src); // add src to the oldMove Stack
-		oldMoves.add(dst); // add dst to the oldMove Stack
+		
+		saveStep();
 		
 		field[dst.x][dst.y] = field[src.x][src.y];
 		field[src.x][src.y] = 0;
 		
 		freeMoves--;
+		
+		nextStep(dst);
 		
 		return true;
 	}
@@ -279,10 +277,7 @@ public class Game {
 		this.freeBlocks = size * size;
 		
 		// Initialize new blocks and oldMove list
-		oldMoves = new ArrayList<Point>();
 		nextBlocks = new ArrayList<Integer>();
-		lastNewBlocks = new ArrayList<Point>();
-		numOflastNewBlocks = new ArrayList<Integer>();
 		nextBlocks.add(1);
 		nextBlocks.add(2);
 		nextBlocks.add(3);
@@ -292,6 +287,8 @@ public class Game {
 		for(int i=0; i<size; i++) {
 			Arrays.fill(field[i], 0);
 		}
+		
+		oldFields = new ArrayList<Integer[][]>();
 		
 		level = 1;
 		score = 0;
@@ -398,6 +395,7 @@ public class Game {
 			}
 		}
 		emitUpdateEvent();
+
 	}
 	
 	/**
@@ -489,8 +487,7 @@ public class Game {
 	 */
 	private void populateField(){
 		
-		numOflastNewBlocks.add(nextBlocks.size()); // add the numbers of blocks to add to the list
-		
+	
 		// while there are blocks left in nextBlocks
 		while((nextBlocks.size() > 0) && (freeBlocks > 0)){
 			int x = rand.nextInt(size); // get random x position
@@ -498,7 +495,6 @@ public class Game {
 			
 			// if the position is free
 			if(field[x][y] == 0){
-				lastNewBlocks.add(new Point(x,y)); // add the new block to the lastNewBlocks list 
 				field[x][y] = nextBlocks.remove(0); // fill with the first element of nextBlocks
 				freeBlocks--;
 				checkRemoveBlocks(new Point(x,y));
