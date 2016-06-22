@@ -2,6 +2,7 @@ package ch.bfh.sevennotseven;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -17,7 +18,7 @@ public class Game {
 	static final int blocksPerLevel []= {3,4,5}; 
 	
 	// Private members
-	private int[][] field;
+	private Integer[][] field;
 	private ArrayList<Integer> nextBlocks;
 	private ArrayList<Point> oldMoves;
 	private ArrayList<Point> lastNewBlocks;
@@ -82,7 +83,7 @@ public class Game {
 		return nextBlocks;
 	}
 	
-	public int[][] getField(){
+	public Integer[][] getField(){
 		return field;
 	
 	}
@@ -287,7 +288,11 @@ public class Game {
 		nextBlocks.add(3);
 		
 		// Initialize field, level and score
-		field = new int[size][size];
+		field = new Integer[size][size];
+		for(int i=0; i<size; i++) {
+			Arrays.fill(field[i], 0);
+		}
+		
 		level = 1;
 		score = 0;
 		numUndos = 100;
