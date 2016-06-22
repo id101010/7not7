@@ -21,6 +21,7 @@ public class Game {
 	private Integer[][] field;
 	private ArrayList<Integer> nextBlocks;
 	private ArrayList<Integer[][]> oldFields;
+	private ArrayList<ArrayList<Integer>> oldNextBlocks;
 	private int level;
 	private int score;
 	private int size;
@@ -217,6 +218,7 @@ public class Game {
 		if(getAvailUndo() > 0 && oldFields.size() > 0){
 
 			field= oldFields.remove(oldFields.size()-1);
+			nextBlocks = oldNextBlocks.remove(oldNextBlocks.size()-1);
 			numUndos--;
 			
 			emitUpdateEvent();
@@ -233,6 +235,7 @@ public class Game {
 			fieldCopy[i] = Arrays.copyOf(field[i], size);
 		}
 		
+		oldNextBlocks.add(new ArrayList<Integer>(nextBlocks));
 		oldFields.add(fieldCopy);
 	}
 	
@@ -288,7 +291,9 @@ public class Game {
 			Arrays.fill(field[i], 0);
 		}
 		
+		//undo stuff
 		oldFields = new ArrayList<Integer[][]>();
+		oldNextBlocks = new ArrayList<ArrayList<Integer>>();
 		
 		level = 1;
 		score = 0;
