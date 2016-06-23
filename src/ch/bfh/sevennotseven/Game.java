@@ -22,6 +22,7 @@ public class Game {
 	private ArrayList<Integer> nextBlocks;
 	private ArrayList<Integer[][]> oldFields;
 	private ArrayList<ArrayList<Integer>> oldNextBlocks;
+	private ArrayList<Integer> oldScore;
 	private int level;
 	private int score;
 	private int size;
@@ -50,7 +51,6 @@ public class Game {
 	
 	public boolean isGameOver(){
 		return false;
-	
 	}
 	
 	public int getAvailFreeMoves(){
@@ -84,12 +84,10 @@ public class Game {
 	
 	public Integer[][] getField(){
 		return field;
-	
 	}
 	
 	public boolean canMove(Point src, Point dst){
 		return getPath(src, dst) != null;
-		
 	}
 	
 	/**
@@ -216,11 +214,20 @@ public class Game {
 	 */
 	public boolean doUndo(){
 		if(getAvailUndo() > 0 && oldFields.size() > 0){
-
-			field= oldFields.remove(oldFields.size()-1);
-			nextBlocks = oldNextBlocks.remove(oldNextBlocks.size()-1);
-			numUndos--;
 			
+			field= oldFields.remove(oldFields.size() - 1);
+			nextBlocks = oldNextBlocks.remove(oldNextBlocks.size() - 1);
+			
+			int old1 = oldScore.get(oldScore.size() - 1); // this round
+			int old2 = oldScore.get(oldScore.size() - 2); // last round
+			
+			// If score has changed in the last round
+			if((oldScore.size() > 1) && (old1 > old2)){
+				score = old2; // Reset score
+			}
+			
+			numUndos--;
+
 			emitUpdateEvent();
 			
 			return true;
@@ -237,6 +244,7 @@ public class Game {
 		
 		oldNextBlocks.add(new ArrayList<Integer>(nextBlocks));
 		oldFields.add(fieldCopy);
+		oldScore.add(score);
 	}
 	
 	/**
@@ -256,7 +264,6 @@ public class Game {
 		if(field[src.x][src.y]==0) {
 			return false;
 		}
-		
 		
 		saveStep();
 		
@@ -294,6 +301,7 @@ public class Game {
 		//undo stuff
 		oldFields = new ArrayList<Integer[][]>();
 		oldNextBlocks = new ArrayList<ArrayList<Integer>>();
+		oldScore = new ArrayList<Integer>();
 		
 		level = 1;
 		score = 0;
@@ -399,6 +407,8 @@ public class Game {
 			
 			}
 		}
+		
+		oldScore.add(score);
 		emitUpdateEvent();
 
 	}
@@ -474,6 +484,7 @@ public class Game {
 			
 			for( Integer i : matches ) sum += i;
 			
+			oldScore.add(score);	
 			score += (1 + distinctmatches * sum);
 			
 			System.out.println("Score: " + score);
@@ -492,7 +503,6 @@ public class Game {
 	 */
 	private void populateField(){
 		
-	
 		// while there are blocks left in nextBlocks
 		while((nextBlocks.size() > 0) && (freeBlocks > 0)){
 			int x = rand.nextInt(size); // get random x position
