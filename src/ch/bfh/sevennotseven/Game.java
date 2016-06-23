@@ -305,8 +305,8 @@ public class Game {
 		
 		level = 1;
 		score = 0;
-		numUndos = 100;
-		freeMoves = 100;
+		numUndos = 2;
+		freeMoves = 0;
 		linesLeft=linesPerLevel;
 		
 		// Populate game field

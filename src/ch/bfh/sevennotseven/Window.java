@@ -1,16 +1,10 @@
-/**
- * 
- */
 package ch.bfh.sevennotseven;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.HeadlessException;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -21,11 +15,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
-
 /**
- * @author aaron
- *
+ * Window class, places gui elements and listeners.
+ * 
+ * @author timo
  */
 public class Window  extends JFrame implements ActionListener{
 	
@@ -42,7 +35,12 @@ public class Window  extends JFrame implements ActionListener{
 	private JPanel mainPanel;
 	private CardLayout cardLayout;
 
-
+	/**
+	 * Constructor of window class
+	 * 
+	 * @param title
+	 * @throws HeadlessException
+	 */
 	public Window(String title) throws HeadlessException {
 		super(title);
 
@@ -60,7 +58,6 @@ public class Window  extends JFrame implements ActionListener{
 		
 		moves.setPreferredSize(new Dimension(200, 40));
 	
-
 		buttonFreeMove= new JButton("Free Move (0)");
 		buttonFreeMove.setEnabled(false);
 		buttonFreeMove.addActionListener(this);
@@ -74,13 +71,18 @@ public class Window  extends JFrame implements ActionListener{
 		labelLevel = new JLabel("Level: 1");
 		
 		JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
+		
 		topPanel.add(buttonFreeMove);
 		topPanel.add(buttonUndo);
 		topPanel.add(labelScore);
 		topPanel.add(labelLinesLeft);
 		topPanel.add(labelLevel);
 		topPanel.add(moves);
+		
+		buttonFreeMove.setEnabled(game.getAvailFreeMoves()>0);
+		buttonUndo.setEnabled(game.getAvailUndo()>0);
+		buttonFreeMove.setText("Free Move ("+game.getAvailFreeMoves()+")");
+		buttonUndo.setText("Undo ("+game.getAvailUndo()+")");
 		
 		game.addUpdateListener(new Game.UpdateListener() {
 			
@@ -106,7 +108,6 @@ public class Window  extends JFrame implements ActionListener{
 			welcomePanel.add(btn);
 		}
 		
-		
 		JPanel gamePanel = new JPanel();
 		gamePanel.setLayout(new BorderLayout());
 		gamePanel.add(topPanel, BorderLayout.NORTH);
@@ -123,10 +124,14 @@ public class Window  extends JFrame implements ActionListener{
 		this.setSize(470,460);
 		this.setVisible(true);
 		
-
-
 	}
 	
+	/**
+	 * Action listener callback, determines which function to call.
+	 * 
+	 * @author timo
+	 * @param e ActionEvent
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
@@ -139,10 +144,13 @@ public class Window  extends JFrame implements ActionListener{
 			cardLayout.last(mainPanel);
 			game.reset(size);
 		}
-			
+		
 	}
 
 	/**
+	 * Main method
+	 * 
+	 * @author timo
 	 * @param args
 	 */
 	public static void main(String[] args) {

@@ -2,6 +2,11 @@ package ch.bfh.sevennotseven;
 
 import java.awt.Point;
 
+/**
+ * Vertex class which abstracts vertices as an object.
+ * 
+ * @author aaron
+ */
 public class Vertex {
 	
 	/* Class Members */

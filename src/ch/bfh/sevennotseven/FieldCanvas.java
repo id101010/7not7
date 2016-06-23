@@ -9,13 +9,19 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+/**
+ * FieldCanvas class, implements the field to draw upon. Draws the game field and handles mouse actions.
+ * 
+ * @author timo
+ */
 public class FieldCanvas extends JPanel{
+	
+	// private and static members
 	private static final long serialVersionUID = 1L;
 	static final int borderLeft = 5;
 	static final int borderRight = 5;
 	static final int borderTop = 5;
 	static final int borderBottom = 5;
-	
 	
 	public static final Color[] colors = { 
 			new Color(0xD66436),
@@ -32,6 +38,12 @@ public class FieldCanvas extends JPanel{
 	private List<Point> path;
 	private boolean freeMoveMode = false;
 	
+	/**
+	 * Constructor of FieldCanvas
+	 * 
+	 * @author timo
+	 * @param g
+	 */
 	FieldCanvas(Game g){
 		MouseAdapter ad = new MouseAdapter(){
 			@Override
@@ -87,12 +99,22 @@ public class FieldCanvas extends JPanel{
 
 	}
 	
+	/**
+	 * Callback if button freeMove gets pressed.
+	 * 
+	 * @author timo
+	 */
 	public void doFreeMove() {
 		if(game.getAvailFreeMoves()>0) {
 			freeMoveMode = true;
 		}
 	}
 	
+	/**
+	 * Callback if button undo gets pressed.
+	 * 
+	 * @author timo
+	 */
 	public void doUndo() {
 		if(game.getAvailUndo()>0) {
 			game.doUndo();
@@ -100,6 +122,13 @@ public class FieldCanvas extends JPanel{
 		}
 	}
 	
+	/**
+	 * Calculates the position in which a click event has happened.
+	 * 
+	 * @author timo
+	 * @param globalPos
+	 * @return Position of clickevent
+	 */
 	private Point getClickPoint(Point globalPos) {
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
 		int space = total/game.getSize();
@@ -109,6 +138,11 @@ public class FieldCanvas extends JPanel{
 		return new Point(globalPos.x/space,globalPos.y/space);	
 	}
 	
+	/**
+	 * Paint the game field.
+	 * 
+	 * @author timo
+	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
