@@ -111,7 +111,7 @@ public class Game {
 	}
 	
 	/**
-	 * Updatelistener callback, updates game when a listener gets triggered.
+	 * Emits the game change event to all registered listeners
 	 * 
 	 * @author aaron
 	 */
@@ -122,12 +122,12 @@ public class Game {
 	}
 	
 	/**
-	 * Check if there is a valid path from src to dst and move a block if possible.
+	 * Try to move the block from src to dst without crossing any walls
 	 * 
 	 * @author aaron
 	 * @param src
 	 * @param dst
-	 * @return True if a move from src to dst is possible.
+	 * @return True if a move was successful
 	 */
 	public boolean doMove(Point src, Point dst){
 		if(field[src.x][src.y] == 0 || field[dst.x][dst.y] != 0 || src.equals(dst)){
@@ -149,12 +149,12 @@ public class Game {
 	}
 	
 	/**
-	 * Pathfinding of shortest path between src and dst.
+	 * Seeks the shortest path between src and dst without crossing any walls
 	 * 
 	 * @author aaron
 	 * @param src
 	 * @param dst
-	 * @return Shortest path between src and dst.
+	 * @return Shortest path between src and dst, or null if there is no path
 	 */
 	public List<Point> getPath(final Point src, final Point dst){
 		
@@ -217,14 +217,7 @@ public class Game {
 			
 			field= oldFields.remove(oldFields.size() - 1);
 			nextBlocks = oldNextBlocks.remove(oldNextBlocks.size() - 1);
-			
-			int old1 = oldScore.get(oldScore.size() - 1); // this round
-			int old2 = oldScore.get(oldScore.size() - 2); // last round
-			
-			// If score has changed in the last round
-			if((oldScore.size() > 1) && (old1 > old2)){
-				score = old2; // Reset score
-			}
+			score = oldScore.remove(oldScore.size()-1);
 			
 			numUndos--;
 
@@ -248,12 +241,13 @@ public class Game {
 	}
 	
 	/**
-	 * Do a free move if freeMoves < 0.
+	 * Move a block from src to dst and jump over walls.
+	 * Only possible if availableFreeMoves()>0
 	 * 
 	 * @author aaron
 	 * @param src
 	 * @param dst
-	 * @return True if freemove is posible.
+	 * @return True if freemove was possible.
 	 */
 	public boolean doFreeMove(Point src, Point dst){
 		//move without path checking
@@ -408,20 +402,21 @@ public class Game {
 			}
 		}
 		
-		oldScore.add(score);
 		emitUpdateEvent();
 
 	}
 	
 	/**
 	 * Collision detection and block removal if there are 4 or more blocks in a row in any direction.
+	 * Also increases the score if necessary
 	 * 
 	 * @author aaron
 	 * @param lastPoint
-	 * @return True if 4 or more blocks got removed.
+	 * @return True if any blocks got removed
 	 */
 	private boolean checkRemoveBlocks(final Point lastPoint){
 		
+		//Offset to reach the neighbors
 		final Point[] offsets = { 
 				new Point(0,1),	 // right
 				new Point(0,-1), // left
@@ -433,47 +428,57 @@ public class Game {
 				new Point(1,-1)  // top right
 		};
 		
-		int matches[] = new int[8];
-		int color = field[lastPoint.x][lastPoint.y];
+		int matches[] = new int[8]; //number of blocks of the same color in each direction
+		int color = field[lastPoint.x][lastPoint.y]; //current block color
 		
-		for(int i = 0; i < 8; i++){
+		//Count the matches per direction
+		for(int i = 0; i < 8; i++){ //for every direction
 			Point offset = offsets[i];
 			Point current = new Point(lastPoint);
 			
-			int matchcount = 0;
-
-			
-			while(true){
-				current.translate(offset.x, offset.y);
+			int matchcount = 0;		
+			while(true){ //iterate until one of the conditions below fail
+				current.translate(offset.x, offset.y); //walk 1 step in the given direction
+				
+				//Abort if out of bounds
 				if(current.x < 0 || current.x >= size || current.y < 0 || current.y >= size) break;
+				
+				//Abort if block there has not the correct color
 				if(field[current.x][current.y] != color) break;
+				
+				//Else: we found one more block that matches an we can continue the loop to seach for more
 				matchcount++;
 			}
 			
 			matches[i] = matchcount;
 		}
 		
-		int distinctmatches = 0;
+		//Detect in which directions we have at least 4 blocks/matches
+		//we always look at two directions together e.g right and left
+		int distinctmatches = 0; //number of directions that have a match
 		
-		for(int i = 0; i < 4; i++){
-			int totalmatches = 1 + matches[i*2] + matches[i*2+1];
-			if(totalmatches >= 4){
+		for(int i = 0; i < 4; i++){ //for the 4 direction pairs
+			int totalmatches = 1 + matches[i*2] + matches[i*2+1]; //sum up matches of both directions + current block
+			if(totalmatches >= 4){ //4 or more blocks => Block-group matched!
 				distinctmatches++;
-				for(int j = 0; j < 2; j++){
+				for(int j = 0; j < 2; j++){ //now remove the blocks
 					Point offset = offsets[j+i*2];
 					Point current = new Point(lastPoint);
 
-					for(int k = 0; k < matches[j+i*2]; k++){
-						current.translate(offset.x, offset.y);
+					for(int k = 0; k < matches[j+i*2]; k++){ //for both directions in this direction pair
+						current.translate(offset.x, offset.y); //go one step in the direction
 						field[current.x][current.y] = 0;
 						freeBlocks++;
 					}
 				}
+			} else { //not enough matches in that direction pair => reset matchcount
+				matches[i*2] = 0;
+				matches[i*2 +1] = 0;
 			}
 		}
 		
-		if(distinctmatches > 0){
-			field[lastPoint.x][lastPoint.y] = 0;
+		if(distinctmatches > 0){ //match in at least on direction (pair)
+			field[lastPoint.x][lastPoint.y] = 0; //remove current block
 			freeBlocks++;
 			
 			if(distinctmatches > 1){
@@ -481,11 +486,10 @@ public class Game {
 			}
 			
 			int sum = 0;
-			
-			for( Integer i : matches ) sum += i;
-			
-			oldScore.add(score);	
-			score += (1 + distinctmatches * sum);
+			for( Integer i : matches ) sum += i; //Sum up the number of blocks which participate in a match
+			//(the other directions matches have been set to 0)
+				
+			score += (1 + distinctmatches * sum); 
 			
 			System.out.println("Score: " + score);
 			
