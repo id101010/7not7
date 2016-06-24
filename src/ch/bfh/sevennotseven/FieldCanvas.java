@@ -24,6 +24,7 @@ public class FieldCanvas extends JPanel{
 	static final int borderTop = 5;
 	static final int borderBottom = 5;
 	
+	//Colors to use to paint the blocks. Chosen with a color scheme designer
 	public static final Color[] colors = { 
 			new Color(0xD66436),
 			new Color(0x486F70),
@@ -34,11 +35,11 @@ public class FieldCanvas extends JPanel{
 	
 	
 	private Game game;
-	private Point src;
-	private Point dst;
-	private List<Point> path;
-	private List<Point> blockedFields;
-	private boolean freeMoveMode = false;
+	private Point src; //Position of the Block that the user wants to move (can be null)
+	private Point dst; //Destination Position (can be null)
+	private List<Point> path; //Path that visualizes src->dst (can be null)
+	private List<Point> blockedFields; //Fields that should be marked as blocked (can be null)
+	private boolean freeMoveMode = false; //Whether or not we're in free moving mode
 	
 	/**
 	 * Constructor of FieldCanvas
@@ -53,9 +54,9 @@ public class FieldCanvas extends JPanel{
 				super.mousePressed(e);
 				
 				Point p = FieldCanvas.this.getClickPoint(e.getPoint());
-				if(p==null || game.getField()[p.x][p.y]==0) { //invalid click
+				if(p==null || game.getField()[p.x][p.y]==0) { //invalid click (outside of bounds or on empty position)
 					src = null;
-				} else {
+				} else { //valid click
 					src = p;
 					if(freeMoveMode) {
 						blockedFields = game.getReachablePoints(src);
@@ -69,24 +70,26 @@ public class FieldCanvas extends JPanel{
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				super.mouseDragged(e);
-				if(src!=null) {
+				if(src!=null) { //we have a valid point that the users wants to move
 					Point lastDst = dst;
 					dst = FieldCanvas.this.getClickPoint(e.getPoint());
 					if(lastDst!=dst && dst!=null) { //hovered field changed
 						if(freeMoveMode) {
+							//Check if the target position is empty and we could not move the block there in normal mode
 							if(!game.canMove(src, dst) && game.getField()[dst.x][dst.y]==0) {
+								//Create fake path with only src and dst
 								path = new ArrayList<Point>();
 								path.add(src);
 								path.add(dst);
 							} else {
 								path= null;
 							}
-						} else {
-							path= game.getPath(src, dst);
+						} else { //not in freemove mode
+							path= game.getPath(src, dst); //calculate path from src to dst (pathfinding)
 						}
 						repaint();
 					}
-				}else {
+				} else { //no valid src
 					dst = null;
 					path = null;
 				}
@@ -96,13 +99,13 @@ public class FieldCanvas extends JPanel{
 			public void mouseReleased(MouseEvent e) {
 				super.mouseReleased(e);
 				dst = FieldCanvas.this.getClickPoint(e.getPoint());
-				path = null;
+				path = null; //do no longer paint path
 				if(freeMoveMode) {
-					if(!game.canMove(src, dst)) {
+					if(!game.canMove(src, dst)) { //if we couldn't move there in normal mode
 						game.doFreeMove(src, dst);
 					}
-				} else {
-					if(dst != null && src!=null && !src.equals(dst)) {
+				} else { //not in freemove mode
+					if(dst != null && src!=null && !src.equals(dst)) { //src and dst are valid
 						System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
 						game.doMove(src, dst);
 					}
@@ -147,11 +150,11 @@ public class FieldCanvas extends JPanel{
 	}
 	
 	/**
-	 * Calculates the position in which a click event has happened.
+	 * Maps a mouse position to game coordinates
 	 * 
 	 * @author timo
-	 * @param globalPos
-	 * @return Position of clickevent
+	 * @param globalPos Position of clickevent
+	 * @return point in game coordinates
 	 */
 	private Point getClickPoint(Point globalPos) {
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
@@ -169,6 +172,8 @@ public class FieldCanvas extends JPanel{
 	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
+		if(game==null) return;
 
 		//Draw field (background and lines)
 		if(freeMoveMode) {
@@ -180,21 +185,20 @@ public class FieldCanvas extends JPanel{
 		g.translate(borderLeft, borderTop);
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
 		int space = total/game.getSize();
+		total = space*game.getSize();
 		
-		g.setClip(0, 0, total-4,total-4);
-		g.fillRect(0, 0, total-4,total-4);
+		g.setClip(0, 0, total+1,total+1);
+		g.fillRect(0, 0, total,total);
 		
 		g.setColor(Color.white);
 	
 		for(int i=0; i<=game.getSize(); i++) {
-			g.drawLine(0,i*space,total-2,i*space);
-			g.drawLine(i*space,0,i*space,total-2);
+			g.drawLine(0,i*space,total,i*space);
+			g.drawLine(i*space,0,i*space,total);
 		}
 	
-		if(game==null) return;
 		
-		//Draw blocks
-		
+		//Draw blocks		
 		for(int x=0; x<game.getSize(); x++) {
 			for(int y=0; y<game.getSize(); y++) {
 				int colorCode = game.getField()[x][y];
@@ -205,8 +209,7 @@ public class FieldCanvas extends JPanel{
 			}
 		}
 		
-		//Draw blocked fields
-		
+		//Draw blocked fields		
 		if(blockedFields!=null) {
 			g.setColor(Color.darkGray);
 			for(int i=0; i<blockedFields.size(); i++) {

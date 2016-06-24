@@ -16,7 +16,7 @@ public class Game {
 	 *
 	 */
 	public interface UpdateListener  {
-		public void gameUpdate();
+		public void gameUpdated();
 	}
 	
 	// Constants
@@ -173,7 +173,7 @@ public class Game {
 	 */
 	private void emitUpdateEvent(){
 		for(UpdateListener e: updateListeners) {
-			e.gameUpdate();
+			e.gameUpdated();
 		}
 	}
 	
@@ -326,6 +326,8 @@ public class Game {
 		
 		// Populate game field
 		this.populateField();
+		
+		emitUpdateEvent();
 	}
 	
 	/**

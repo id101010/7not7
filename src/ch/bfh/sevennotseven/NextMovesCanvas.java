@@ -6,7 +6,15 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-public class NextMovesCanvas extends JPanel {
+/**
+ * Class which renders the Blocks that will be placed next on the field
+ * @author timo
+ *
+ */
+public class NextMovesCanvas extends JPanel implements Game.UpdateListener {
+
+	private static final long serialVersionUID = 1L;
+
 	private Game game;
 	
 	static final int borderLeft = 1;
@@ -16,18 +24,16 @@ public class NextMovesCanvas extends JPanel {
 	
 	public NextMovesCanvas(Game g) {
 		this.game = g;
-		g.addUpdateListener(new Game.UpdateListener() {
-			@Override
-			public void gameUpdate() {
-				NextMovesCanvas.this.repaint();
-			}
-		});
+		g.addUpdateListener(this);
 	}
 	
+	@Override
+	public void gameUpdated() {
+		NextMovesCanvas.this.repaint();
+	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
 		
 		g.setColor(Color.lightGray);
 		int height = getHeight() - borderTop-borderBottom;
