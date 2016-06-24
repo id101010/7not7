@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -36,6 +37,7 @@ public class FieldCanvas extends JPanel{
 	private Point src;
 	private Point dst;
 	private List<Point> path;
+	private List<Point> blockedFields;
 	private boolean freeMoveMode = false;
 	
 	/**
@@ -55,6 +57,12 @@ public class FieldCanvas extends JPanel{
 					src = null;
 				} else {
 					src = p;
+					if(freeMoveMode) {
+						blockedFields = game.getReachablePoints(src);
+					} else {
+						blockedFields = game.getUnreachablePoints(src);
+					}
+					repaint();
 				}
 			}
 			
@@ -64,11 +72,21 @@ public class FieldCanvas extends JPanel{
 				if(src!=null) {
 					Point lastDst = dst;
 					dst = FieldCanvas.this.getClickPoint(e.getPoint());
-					if(lastDst!=dst) { //hovered field changed
-						path= game.getPath(src, dst);
+					if(lastDst!=dst && dst!=null) { //hovered field changed
+						if(freeMoveMode) {
+							if(!game.canMove(src, dst) && game.getField()[dst.x][dst.y]==0) {
+								path = new ArrayList<Point>();
+								path.add(src);
+								path.add(dst);
+							} else {
+								path= null;
+							}
+						} else {
+							path= game.getPath(src, dst);
+						}
 						repaint();
 					}
-				} else {
+				}else {
 					dst = null;
 					path = null;
 				}
@@ -79,8 +97,10 @@ public class FieldCanvas extends JPanel{
 				super.mouseReleased(e);
 				dst = FieldCanvas.this.getClickPoint(e.getPoint());
 				path = null;
-				if(freeMoveMode && !game.canMove(src, dst)) {
-					game.doFreeMove(src, dst);
+				if(freeMoveMode) {
+					if(!game.canMove(src, dst)) {
+						game.doFreeMove(src, dst);
+					}
 				} else {
 					if(dst != null && src!=null && !src.equals(dst)) {
 						System.out.println("Moving from "+src.toString()+ " to "+dst.toString());
@@ -89,6 +109,7 @@ public class FieldCanvas extends JPanel{
 				}
 				freeMoveMode = false;
 				src = null;
+				blockedFields = null;
 				repaint();
 			}
 		};
@@ -104,10 +125,13 @@ public class FieldCanvas extends JPanel{
 	 * 
 	 * @author timo
 	 */
-	public void doFreeMove() {
-		if(game.getAvailFreeMoves()>0) {
+	public void toggleFreeMove() {
+		if(freeMoveMode) {
+			freeMoveMode =false;
+		} else if(game.getAvailFreeMoves()>0) {
 			freeMoveMode = true;
 		}
+		repaint();
 	}
 	
 	/**
@@ -146,7 +170,12 @@ public class FieldCanvas extends JPanel{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		g.setColor(Color.lightGray);
+		//Draw field (background and lines)
+		if(freeMoveMode) {
+			g.setColor(Color.gray);
+		} else {
+			g.setColor(Color.lightGray);
+		}
 		
 		g.translate(borderLeft, borderTop);
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
@@ -164,6 +193,8 @@ public class FieldCanvas extends JPanel{
 	
 		if(game==null) return;
 		
+		//Draw blocks
+		
 		for(int x=0; x<game.getSize(); x++) {
 			for(int y=0; y<game.getSize(); y++) {
 				int colorCode = game.getField()[x][y];
@@ -174,15 +205,24 @@ public class FieldCanvas extends JPanel{
 			}
 		}
 		
+		//Draw blocked fields
+		
+		if(blockedFields!=null) {
+			g.setColor(Color.darkGray);
+			for(int i=0; i<blockedFields.size(); i++) {
+				Point p = blockedFields.get(i);
+				g.drawLine(p.x*space+1, p.y*space+1, (p.x+1)*space, (p.y+1)*space);
+				g.drawLine((p.x+1)*space-1, p.y*space+2, p.x*space+1, (p.y+1)*space);
+			}
+		}
+		
+		//Draw Path
 		if(path!=null && src!=null && dst!=null) {
 			int colorCode = game.getField()[src.x][src.y];
 			Color c = colors[colorCode-1];
 			int sSpace = space/3;	
 			int sSpace2 = space/5;
 			
-			g.setColor(Color.lightGray);
-			g.fillRect(src.x*space+2, src.y*space+2, space -3, space -3);
-			g.fillRect(dst.x*space+2, dst.y*space+2, space -3, space -3);
 			
 			g.setColor(c);
 			g.fillRect(src.x*space+2+sSpace2, src.y*space+2+sSpace2, space -3 - 2* sSpace2, space -3 - 2* sSpace2);

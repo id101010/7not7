@@ -114,24 +114,28 @@ public class PathFinder {
 	 * @param src starting point
 	 */
 	public void calculateCosts(final int[][] field, int size, final Point src) {
-		ArrayList<Vertex> vertices = new ArrayList<Vertex>(); // List of vertices
+		ArrayList<Vertex> openVerticies = new ArrayList<Vertex>(); // List of vertices
 
-		vertices.add(new Vertex(0, src));
+		openVerticies.add(new Vertex(0, src));
 	
 		// Get a verticies list from the field data
 		for(int i= 0; i < size; i++){
 			for(int j = 0; j < size; j++){
 				if(field[i][j] == 0 && (src.x!=i || src.y!=j)){ //field empty and not src
-					vertices.add(new Vertex(Integer.MAX_VALUE, new Point(i, j)));
+					openVerticies.add(new Vertex(Integer.MAX_VALUE, new Point(i, j)));
 				}
 			}
 		}
 		
-		ArrayList<Vertex> allVerticies = new ArrayList<Vertex>(vertices); // List of vertices
+		ArrayList<Vertex> allVerticies = new ArrayList<Vertex>(openVerticies); // List of vertices
 		
-		while(!vertices.isEmpty()){ // As long as there are vertices 
-			final Vertex u = findNearestVertex(vertices);	
-			vertices.remove(u);	// Remove u from the set of vertices
+		while(!openVerticies.isEmpty()){ // As long as there are vertices 
+			final Vertex u = findNearestVertex(openVerticies);	
+			openVerticies.remove(u);	// Remove u from the set of vertices
+			
+			if(u.getDist()==Integer.MAX_VALUE) {
+				continue;
+			}
 			
 			final Point[] offsets = { 
 				new Point(0,1),
@@ -147,7 +151,7 @@ public class PathFinder {
 				int y = p.y + offs.y;
 				if(x<0 || y<0 || x>=size || y>= size) continue;
 			
-				final Vertex v = findVertex(x,y, vertices);
+				final Vertex v = findVertex(x,y, openVerticies);
 				//distanz_update(u,v)
 				if(v!=null){
 					int alternative = u.getDist()+1; //alternative has cost of current path + 1 (=cost to reach neighbor)
@@ -162,7 +166,7 @@ public class PathFinder {
 		lastSrc = src;
 		verticies = allVerticies;	
 		lastField = field;
-		lastSize = size;
+		lastSize = size;		
 	}
 	
 	
@@ -205,7 +209,7 @@ public class PathFinder {
 				if(lastField[x][y]!=0) continue;
 				Vertex u = findVertex(x, y, verticies);
 				if(u==null) continue;
-				if(u.getPrev()!=null && u.getDist()!=Integer.MAX_VALUE) {
+				if(u.getPrev()!=null && u.getDist()!= Integer.MAX_VALUE) {
 					res.add(u.getPos());
 				}
 			}
@@ -225,7 +229,7 @@ public class PathFinder {
 				if(lastSrc.x == x && lastSrc.y ==y) continue;
 				if(lastField[x][y]!=0) continue;
 				Vertex u = findVertex(x, y, verticies);
-				if(u==null|| u.getPrev() == null) {
+				if(u==null|| u.getPrev() == null || u.getDist() == Integer.MAX_VALUE) {
 					res.add(u.getPos());
 				}
 			}

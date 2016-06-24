@@ -74,7 +74,7 @@ public class Game {
 	private int level; //the current level
 	private int linesLeft; //the number of lines left to the next level
 	
-	
+	//General stuff
 	private ArrayList<State> lastStates; //Last Game States. Has one entry per move
 	private int size; //size of the field along one dimension
 	private int freeBlocks; //number of free block positions on the field
@@ -82,7 +82,10 @@ public class Game {
 	private int numUndos; //number of undos left
 	private Random rand; //instance to get random numbers from
 	private ArrayList<UpdateListener> updateListeners; //registered listeners
-	private PathFinder pathfinder;
+	
+	//Stuff for pathfinding
+	private PathFinder pathfinder; //Path finder helper instance
+	private Point lastSrc; //last src point that was used with pathfinder
 	
 	public Game(){
 		this(7);
@@ -210,8 +213,28 @@ public class Game {
 	 * @return Shortest path between src and dst, or null if there is no path
 	 */
 	public List<Point> getPath(final Point src, final Point dst){
-		pathfinder.calculateCosts(field, size, src);
+		
+		//recalculate costs only if src changed
+		if(lastSrc==null || !src.equals(lastSrc)) {
+			pathfinder.calculateCosts(field, size, src);
+		}
 		return pathfinder.getPath(dst);
+	}
+	
+	public List<Point> getReachablePoints(final Point src) {
+		//recalculate costs only if necessary
+		if(lastSrc==null || !src.equals(lastSrc)) {
+			pathfinder.calculateCosts(field, size, src);
+		}
+		return pathfinder.getReachablePoints();
+	}
+	
+	public List<Point> getUnreachablePoints(final Point src) {
+		//recalculate costs only if necessary
+		if(lastSrc==null || !src.equals(lastSrc)) {
+			pathfinder.calculateCosts(field, size, src);
+		}
+		return pathfinder.getUnreachablePoints();
 	}
 	
 	/**
@@ -223,8 +246,11 @@ public class Game {
 	public boolean doUndo(){
 		if(getAvailUndo() > 0 && lastStates.size() > 0){
 			
-			lastStates.remove(lastStates.size() - 1).restore();
+			lastStates.remove(lastStates.size() - 1).restore(); //take last state from the stack and restore it
 			numUndos--;
+			
+			//Reset value for pathfinding cache, so that we are sure we recalculate the pathes/costs
+			lastSrc = null;
 			
 			emitUpdateEvent();
 			return true;
@@ -234,6 +260,9 @@ public class Game {
 	
 	private void saveStep() {
 		lastStates.add(new State()); //add a new State Object (which will be initialized to the current game state) to the backup list
+		
+		//Reset value for pathfinding cache, so that we are sure we recalculate the pathes/costs
+		lastSrc = null;
 	}
 	
 	/**

@@ -138,7 +138,7 @@ public class Window  extends JFrame implements ActionListener{
 		if(command.equals("undo")) {
 			field.doUndo();
 		} else if (command.equals("freemove")) {
-			field.doFreeMove();
+			field.toggleFreeMove();
 		} else {
 			int size = Integer.parseInt(command);
 			cardLayout.last(mainPanel);
