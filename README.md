@@ -18,13 +18,13 @@ So you can eighter build up blocks vertically, horizontally or diagonal.
 
 ### Tools and how to get them
 
-To make things more fun and to survive in higher levels there are 2 tools. 
+To make things more fun and to survive in higher levels there are the following two tools. 
 
-- FreeMove
+- Undo
 
 An undo simply undos the last action on the game field. At the beginning you start with only two undos. You'll get an undo on each level-up.
 
-- Undo
+- FreeMove
 
 Additionally you earn FreeMoves by completing combos. FreeMoves enable you to bend the space time continuum and replace a block anywhere on the game field even if its surrounded by other blocks. 
 
