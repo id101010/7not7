@@ -82,6 +82,7 @@ public class Game {
 	private int numUndos; //number of undos left
 	private Random rand; //instance to get random numbers from
 	private ArrayList<UpdateListener> updateListeners; //registered listeners
+	private PathFinder pathfinder;
 	
 	public Game(){
 		this(7);
@@ -96,6 +97,7 @@ public class Game {
 	public Game (int size) {		
 		rand = new Random(); // Initialize random object
 		this.updateListeners = new ArrayList<UpdateListener>();
+		this.pathfinder = new PathFinder();
 		this.reset(size);
 	}
 	
@@ -208,53 +210,8 @@ public class Game {
 	 * @return Shortest path between src and dst, or null if there is no path
 	 */
 	public List<Point> getPath(final Point src, final Point dst){
-		
-		ArrayList<Vertex> vertices = new ArrayList<Vertex>(); // List of vertices
-
-		vertices.add(new Vertex(0, src));
-	
-		// Get a verticies list from the field data
-		for(int i= 0; i < size; i++){
-			for(int j = 0; j < size; j++){
-				if(field[i][j] == 0 && (src.x!=i || src.y!=j)){ //field empty and not src
-					vertices.add(new Vertex(Integer.MAX_VALUE, new Point(i, j)));
-				}
-			}
-		}
-		
-		ArrayList<Vertex> allVerticies = new ArrayList<Vertex>(vertices); // List of vertices
-		
-		while(!vertices.isEmpty()){ // As long as there are vertices 
-			final Vertex u = findNearestVertex(vertices);	
-			vertices.remove(u);	// Remove u from the set of vertices
-			
-			final Point[] offsets = { 
-				new Point(0,1),
-				new Point(0,-1),
-				new Point(1,0),
-				new Point(-1,0)
-			};
-			
-			for(int i = 0; i < 4; i++){	// for each neighbour of u ...
-				final Point p = u.getPos();
-				final Point offs = offsets[i];
-				int x = p.x + offs.x;
-				int y = p.y + offs.y;
-				if(x<0 || y<0 || x>=size || y>= size) continue;
-			
-				final Vertex v = findVertex(x,y, vertices);
-				//distanz_update(u,v)
-				if(v!=null){
-					int alternative = u.getDist()+1;
-					if( alternative< v.getDist()) { 
-						v.setDist(alternative);
-						v.setPrev(u);
-					}
-				}
-			}
-		}
-
-		return reconstructShortestPath(allVerticies, src,dst);
+		pathfinder.calculateCosts(field, size, src);
+		return pathfinder.getPath(dst);
 	}
 	
 	/**
@@ -267,14 +224,11 @@ public class Game {
 		if(getAvailUndo() > 0 && lastStates.size() > 0){
 			
 			lastStates.remove(lastStates.size() - 1).restore();
-			
 			numUndos--;
-
-			emitUpdateEvent();
 			
+			emitUpdateEvent();
 			return true;
 		}
-		
 		return false;
 	}
 	
@@ -345,82 +299,6 @@ public class Game {
 		this.populateField();
 	}
 	
-	/**
-	 * Finds the nearest vertex to start
-	 * 
-	 * @author aaron
-	 * @param vertices
-	 * @return Nearest vertex to the fist element of the given vertices list.
-	 */
-	private Vertex findNearestVertex(final List<Vertex> vertices){
-		Vertex tmp = vertices.get(0);
-		
-		for (int i = 1; i < vertices.size(); i++) {
-			Vertex n = vertices.get(i);
-			if(n.getDist() < tmp.getDist()) {
-				tmp = n;
-			}
-		}
-		
-		return tmp;
-	}
-	
-	/**
-	 * Helper function for pathfinding. Finds a vertex corresponding to the given coordinate.
-	 * 
-	 * @author aaron
-	 * @param x
-	 * @param y
-	 * @param vertices
-	 * @return Vertex with the given position out of a list of vertices.
-	 */
-	private Vertex findVertex(int x, int y, final List<Vertex> vertices){
-		return findVertex(new Point(x,y), vertices);
-	}
-
-	/**
-	 * Helper function for pathfinding. Finds a vertex corresponding to the given point.
-	 * 
-	 * @author aaron
-	 * @param pos
-	 * @param vertices
-	 * @return Vertex with the given position out of a list of vertices.
-	 */
-	private Vertex findVertex(final Point pos, final List<Vertex> vertices){
-		for (int i = 0; i < vertices.size(); i++) {
-			Vertex n = vertices.get(i);
-			if(n.getPos().equals(pos)) {
-				return n;
-			}
-		}
-		return null;
-	}
-	
-	/**
-	 * Helper function for pathfinding. Returns shortest path between src and dst in a given set of vertices.
-	 * 
-	 * @author aaron
-	 * @param vertices
-	 * @param src
-	 * @param dst
-	 * @return Shortest path between two given points in a list of vertices.
-	 */
-	private List<Point> reconstructShortestPath(final List<Vertex> vertices, final Point src, final Point dst){
-		ArrayList<Point> path = new ArrayList<Point>();
-		path.add(dst);
-		Vertex u = findVertex(dst, vertices);
-		if(u==null) {
-			return null;
-		}
-		while(u.getPrev()!=null){
-			u= u.getPrev();
-			path.add(0, u.getPos());
-		}
-		if(u!=findVertex(src, vertices)){
-			return null;
-		}
-		return path;
-	}
 	/**
 	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
 	 *
