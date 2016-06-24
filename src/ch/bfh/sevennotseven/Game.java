@@ -8,7 +8,14 @@ import java.util.Random;
 
 public class Game {
 	
-	interface UpdateListener  {
+	/**
+	 * Interface for Game Update Listeners
+	 * Listeners who want to receive game updates events (e.g. after the player has done a move) 
+	 *  should implement this interface and call addUpdateListener on the Game class.
+	 * @author timo
+	 *
+	 */
+	public interface UpdateListener  {
 		public void gameUpdate();
 	}
 	
@@ -17,21 +24,64 @@ public class Game {
 	static final int linesPerLevel = 40;
 	static final int blocksPerLevel []= {3,4,5}; 
 	
+	/**
+	 * Class that stores one specific state of the game and restores it on demand
+	 * @author timo
+	 *
+	 */
+	private class State {
+		
+		/**
+		 * Creates new State Object containing the current game state
+		 */
+		State() {
+			field = new int[size][size];
+			//Deep copy field array
+			for(int i=0; i<size; i++) {
+				field[i] = Arrays.copyOf(Game.this.field[i], size); //copies one dimension
+			}
+			
+			nextBlocks = new ArrayList<Integer>(Game.this.nextBlocks);
+			score = Game.this.score;	
+			linesLeft = Game.this.linesLeft;
+			level = Game.this.level;
+		}
+		
+		private ArrayList<Integer> nextBlocks;
+		private int score;
+		private int field[][];
+		private int linesLeft;
+		private int level;
+		
+		/**
+		 * Restores the game state
+		 */
+		void restore() {
+			Game.this.score = score;
+			Game.this.field = field;
+			Game.this.nextBlocks = nextBlocks;
+			Game.this.linesLeft = linesLeft;
+			Game.this.level = level;
+		}
+		
+	}
+	
 	// Private members
-	private Integer[][] field;
-	private ArrayList<Integer> nextBlocks;
-	private ArrayList<Integer[][]> oldFields;
-	private ArrayList<ArrayList<Integer>> oldNextBlocks;
-	private ArrayList<Integer> oldScore;
-	private int level;
-	private int score;
-	private int size;
-	private int freeBlocks;
-	private int freeMoves;
-	private int numUndos;
-	private int linesLeft;
-	private Random rand;
-	private ArrayList<UpdateListener> updateListeners;
+	//  State relevant members that can be undone by calling doUndo()
+	private int[][] field; //current game field with all blocks. an entry of 0 means there's no block at this position
+	private ArrayList<Integer> nextBlocks; //the colors which will be placed in the next move
+	private int score; //the current score
+	private int level; //the current level
+	private int linesLeft; //the number of lines left to the next level
+	
+	
+	private ArrayList<State> lastStates; //Last Game States. Has one entry per move
+	private int size; //size of the field along one dimension
+	private int freeBlocks; //number of free block positions on the field
+	private int freeMoves; //number of freemoves left
+	private int numUndos; //number of undos left
+	private Random rand; //instance to get random numbers from
+	private ArrayList<UpdateListener> updateListeners; //registered listeners
 	
 	public Game(){
 		this(7);
@@ -82,7 +132,7 @@ public class Game {
 		return nextBlocks;
 	}
 	
-	public Integer[][] getField(){
+	public int[][] getField(){
 		return field;
 	}
 	
@@ -92,6 +142,7 @@ public class Game {
 	
 	/**
 	 * Adds an update listener to the game object.
+	 * The listener will be called when the game has an update (e.g. the user made a move)
 	 * 
 	 * @author aaron
 	 * @param listener
@@ -102,7 +153,7 @@ public class Game {
 	
 	/**
 	 * Removes the update listener from the game object.
-	 * 
+	 * The listener will no longer be called
 	 * @author aaron
 	 * @param listener
 	 */
@@ -213,11 +264,9 @@ public class Game {
 	 * @return True if undo was possible.
 	 */
 	public boolean doUndo(){
-		if(getAvailUndo() > 0 && oldFields.size() > 0){
+		if(getAvailUndo() > 0 && lastStates.size() > 0){
 			
-			field= oldFields.remove(oldFields.size() - 1);
-			nextBlocks = oldNextBlocks.remove(oldNextBlocks.size() - 1);
-			score = oldScore.remove(oldScore.size()-1);
+			lastStates.remove(lastStates.size() - 1).restore();
 			
 			numUndos--;
 
@@ -230,14 +279,7 @@ public class Game {
 	}
 	
 	private void saveStep() {
-		Integer[][] fieldCopy = new Integer[size][size];
-		for(int i=0; i<size; i++) {
-			fieldCopy[i] = Arrays.copyOf(field[i], size);
-		}
-		
-		oldNextBlocks.add(new ArrayList<Integer>(nextBlocks));
-		oldFields.add(fieldCopy);
-		oldScore.add(score);
+		lastStates.add(new State()); //add a new State Object (which will be initialized to the current game state) to the backup list
 	}
 	
 	/**
@@ -287,15 +329,11 @@ public class Game {
 		nextBlocks.add(3);
 		
 		// Initialize field, level and score
-		field = new Integer[size][size];
-		for(int i=0; i<size; i++) {
-			Arrays.fill(field[i], 0);
-		}
+		field = new int[size][size];
+
 		
 		//undo stuff
-		oldFields = new ArrayList<Integer[][]>();
-		oldNextBlocks = new ArrayList<ArrayList<Integer>>();
-		oldScore = new ArrayList<Integer>();
+		lastStates = new ArrayList<State>();
 		
 		level = 1;
 		score = 0;
