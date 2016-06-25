@@ -21,7 +21,6 @@ import javax.swing.JPanel;
 /**
  * Window class, contains the welcome screen and the game itself
  * 
- * @author timo
  */
 public class Window  extends JFrame implements ActionListener, Game.UpdateListener {
 	
@@ -144,7 +143,6 @@ public class Window  extends JFrame implements ActionListener, Game.UpdateListen
 	 * Action listener callback: gets called when a button was pressed
 	 * The method will either start a game or forward an action to the game
 	 * 
-	 * @author timo
 	 * @param e ActionEvent
 	 */
 	@Override
@@ -191,7 +189,6 @@ public class Window  extends JFrame implements ActionListener, Game.UpdateListen
 	/**
 	 * Main method
 	 * 
-	 * @author timo
 	 * @param args
 	 */
 	public static void main(String[] args) {

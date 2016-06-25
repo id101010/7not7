@@ -7,7 +7,6 @@ import java.util.List;
 /**
  * Class which provides helper to find the shortest path between two points
  * Based on pseudo-code from https://de.wikipedia.org/wiki/Dijkstra-Algorithmus#Algorithmus_in_Pseudocode
- * @author aaron/timo
  *
  */
 public class PathFinder {
@@ -28,7 +27,6 @@ public class PathFinder {
 		/**
 		 * Costructor
 		 * 
-		 * @author aaron
 		 * @param int dist
 		 * @param Point pos
 		 */
@@ -41,7 +39,6 @@ public class PathFinder {
 		/**
 		 * Set the distance
 		 * 
-		 * @author aaron
 		 * @param int dist
 		 */
 		public void setDist(int dist){
@@ -51,7 +48,6 @@ public class PathFinder {
 		/**
 		 * Set current position
 		 * 
-		 * @author aaron
 		 * @param Point pos
 		 */
 		public void setPos(Point pos){
@@ -61,7 +57,6 @@ public class PathFinder {
 		/**
 		 * Set previous vertex
 		 * 
-		 * @author aaron
 		 * @param Vertex prev
 		 */
 		public void setPrev(Vertex prev){
@@ -71,7 +66,6 @@ public class PathFinder {
 		/**
 		 * Get the distance 
 		 * 
-		 * @author aaron
 		 * @return int dist
 		 */
 		public int getDist(){
@@ -81,7 +75,6 @@ public class PathFinder {
 		/** 
 		 * Get current position
 		 * 
-		 * @author aaron
 		 * @return Point pos
 		 */
 		public Point getPos(){
@@ -91,7 +84,6 @@ public class PathFinder {
 		/** 
 		 * Get previous vertex
 		 * 
-		 * @author aaron
 		 * @return Vertex prev
 		 */
 		public Vertex getPrev(){
@@ -173,7 +165,6 @@ public class PathFinder {
 	
 	/**
 	 * Seeks the shortest path to dst without crossing any walls
-	 * @author aaron
 	 * @param dst
 	 * @return Shortest path between src and dst, or null if there is no path
 	 */
@@ -241,7 +232,6 @@ public class PathFinder {
 	/**
 	 * Finds the nearest vertex to start
 	 * 
-	 * @author aaron
 	 * @param vertices
 	 * @return Nearest vertex to the fist element of the given vertices list.
 	 */
@@ -261,7 +251,6 @@ public class PathFinder {
 	/**
 	 * Helper function for pathfinding. Finds a vertex corresponding to the given coordinate.
 	 * 
-	 * @author aaron
 	 * @param x
 	 * @param y
 	 * @param vertices
@@ -274,7 +263,6 @@ public class PathFinder {
 	/**
 	 * Helper function for pathfinding. Finds a vertex corresponding to the given point.
 	 * 
-	 * @author aaron
 	 * @param pos
 	 * @param vertices
 	 * @return Vertex with the given position out of a list of vertices.

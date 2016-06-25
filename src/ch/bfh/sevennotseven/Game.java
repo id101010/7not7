@@ -12,7 +12,6 @@ public class Game {
 	 * Interface for Game Update Listeners
 	 * Listeners who want to receive game updates events (e.g. after the player has done a move) 
 	 *  should implement this interface and call addUpdateListener on the Game class.
-	 * @author timo
 	 *
 	 */
 	public interface UpdateListener  {
@@ -26,7 +25,6 @@ public class Game {
 	
 	/**
 	 * Class that stores one specific state of the game and restores it on demand
-	 * @author timo
 	 *
 	 */
 	private class State {
@@ -94,7 +92,6 @@ public class Game {
 	/**
 	 * Constructor.
 	 * 
-	 * @author aaron
 	 * @param size
 	 */
 	public Game (int size) {		
@@ -149,7 +146,6 @@ public class Game {
 	 * Adds an update listener to the game object.
 	 * The listener will be called when the game has an update (e.g. the user made a move)
 	 * 
-	 * @author aaron
 	 * @param listener
 	 */
 	public void addUpdateListener(UpdateListener listener){
@@ -159,7 +155,6 @@ public class Game {
 	/**
 	 * Removes the update listener from the game object.
 	 * The listener will no longer be called
-	 * @author aaron
 	 * @param listener
 	 */
 	public void removeUpdateListener(UpdateListener listener){
@@ -169,7 +164,6 @@ public class Game {
 	/**
 	 * Emits the game change event to all registered listeners
 	 * 
-	 * @author aaron
 	 */
 	private void emitUpdateEvent(){
 		for(UpdateListener e: updateListeners) {
@@ -180,7 +174,6 @@ public class Game {
 	/**
 	 * Try to move the block from src to dst without crossing any walls
 	 * 
-	 * @author aaron
 	 * @param src
 	 * @param dst
 	 * @return True if a move was successful
@@ -207,7 +200,6 @@ public class Game {
 	/**
 	 * Seeks the shortest path between src and dst without crossing any walls
 	 * 
-	 * @author aaron
 	 * @param src
 	 * @param dst
 	 * @return Shortest path between src and dst, or null if there is no path
@@ -240,7 +232,6 @@ public class Game {
 	/**
 	 * Undo the last move if there are enough available undos.
 	 * 
-	 * @author aaron
 	 * @return True if undo was possible.
 	 */
 	public boolean doUndo(){
@@ -269,7 +260,6 @@ public class Game {
 	 * Move a block from src to dst and jump over walls.
 	 * Only possible if availableFreeMoves()>0
 	 * 
-	 * @author aaron
 	 * @param src
 	 * @param dst
 	 * @return True if freemove was possible.
@@ -299,7 +289,6 @@ public class Game {
 	/**
 	 * Reset game score, field and state.
 	 * 
-	 * @author aaron
 	 */
 	public void reset(int size){
 		this.size = size;
@@ -333,7 +322,6 @@ public class Game {
 	/**
 	 * Calculates the next game step. This method will either call populateField, or it will cleanup blocks 
 	 *
-	 * @author aaron
 	 * @param lastPoint
 	 */
 	private void nextStep(final Point lastPoint){
@@ -357,7 +345,6 @@ public class Game {
 	 * Collision detection and block removal if there are 4 or more blocks in a row in any direction.
 	 * Also increases the score if necessary
 	 * 
-	 * @author aaron
 	 * @param lastPoint
 	 * @return True if any blocks got removed
 	 */
@@ -450,7 +437,6 @@ public class Game {
 	/**
 	 * Adds n new blocks to random positions on the field, according to the level number.
 	 * 
-	 * @author aaron
 	 */
 	private void populateField(){
 		

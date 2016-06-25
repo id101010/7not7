@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 
 /**
  * Class which renders the Blocks that will be placed next on the field
- * @author timo
  *
  */
 public class NextMovesCanvas extends JPanel implements Game.UpdateListener {

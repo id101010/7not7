@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 /**
  * FieldCanvas class, implements the field to draw upon. Draws the game field and handles mouse actions.
  * 
- * @author timo
  */
 public class FieldCanvas extends JPanel{
 	
@@ -44,7 +43,6 @@ public class FieldCanvas extends JPanel{
 	/**
 	 * Constructor of FieldCanvas
 	 * 
-	 * @author timo
 	 * @param g
 	 */
 	FieldCanvas(Game g){
@@ -126,7 +124,6 @@ public class FieldCanvas extends JPanel{
 	/**
 	 * Callback if button freeMove gets pressed.
 	 * 
-	 * @author timo
 	 */
 	public void toggleFreeMove() {
 		if(freeMoveMode) {
@@ -140,7 +137,6 @@ public class FieldCanvas extends JPanel{
 	/**
 	 * Callback if button undo gets pressed.
 	 * 
-	 * @author timo
 	 */
 	public void doUndo() {
 		if(game.getAvailUndo()>0) {
@@ -152,7 +148,6 @@ public class FieldCanvas extends JPanel{
 	/**
 	 * Maps a mouse position to game coordinates
 	 * 
-	 * @author timo
 	 * @param globalPos Position of clickevent
 	 * @return point in game coordinates
 	 */
@@ -168,7 +163,6 @@ public class FieldCanvas extends JPanel{
 	/**
 	 * Paint the game field.
 	 * 
-	 * @author timo
 	 */
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
