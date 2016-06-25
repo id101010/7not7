@@ -19,9 +19,9 @@ public class Game {
 	}
 	
 	// Constants
-	static final int numberOfColors = 5;
-	static final int linesPerLevel = 40;
-	static final int blocksPerLevel []= {3,4,5}; 
+	static final int numberOfColors = 5; //number of distinct block colors
+	static final int linesPerLevel = 40; //number of lines the user has to clear before he moves to the next level
+	static final int blocksPerLevel []= {3,4,5}; //number of blocks that are added in each step for the first n=3 levels.
 	
 	/**
 	 * Class that stores one specific state of the game and restores it on demand
@@ -45,6 +45,7 @@ public class Game {
 			level = Game.this.level;
 		}
 		
+		//Storage for the state variables
 		private ArrayList<Integer> nextBlocks;
 		private int score;
 		private int field[][];
@@ -101,43 +102,77 @@ public class Game {
 		this.reset(size);
 	}
 	
-	public boolean isGameOver(){
-		return false;
-	}
-	
+	/**
+	 * Returns the number of freemoves left 
+	 * @return
+	 */
 	public int getAvailFreeMoves(){
 		return freeMoves;
 	}
 	
+	/**
+	 * Returns the number of available undos
+	 * @return
+	 */
 	public int getAvailUndo(){
 		return numUndos;
 	}
 	
+	/**
+	 * Returns the size of the game in one dimensions (field is always quadratic)
+	 * @return
+	 */
 	public int getSize(){
 		return size;
 	}
 	
+	/**
+	 * Returns the current score
+	 * @return
+	 */
 	public int getScore(){
 		return score;
 	
 	}
 	
+	/**
+	 * Returns the number of lines that need to be cleared to reach the next level
+	 * @return
+	 */
 	public int getLinesLeft(){
 		return linesLeft;
 	}
 	
+	/**
+	 * Returns the current level number
+	 * @return
+	 */
 	public int getLevel(){
 		return level;
 	}
 	
+	/**
+	 * Returns the block color which will be placed next on the field
+	 * @return
+	 */
 	public List<Integer> getNextBlocks(){
 		return nextBlocks;
 	}
 	
-	public int[][] getField(){
+	/**
+	 * Returns the current game field
+	 * @return
+	 */
+	public final int[][] getField(){
 		return field;
 	}
 	
+	/**
+	 * Returns whether or not we can move from src to dst without crossing any walls
+	 * @param src start point
+	 * @param dst destination point
+	 * @return true if move is possible
+	 */
 	public boolean canMove(Point src, Point dst){
 		return getPath(src, dst) != null;
 	}
@@ -172,10 +207,10 @@ public class Game {
 	}
 	
 	/**
-	 * Try to move the block from src to dst without crossing any walls
+	 * Try to move the block from src to dst (without crossing any walls)
 	 * 
-	 * @param src
-	 * @param dst
+	 * @param src source block position
+	 * @param dst destination position
 	 * @return True if a move was successful
 	 */
 	public boolean doMove(Point src, Point dst){
@@ -198,7 +233,7 @@ public class Game {
 	}
 	
 	/**
-	 * Seeks the shortest path between src and dst without crossing any walls
+	 * Returns the shortest path between src and dst (without crossing any walls)
 	 * 
 	 * @param src
 	 * @param dst
@@ -249,6 +284,9 @@ public class Game {
 		return false;
 	}
 	
+	/**
+	 * Saves the current game state/step
+	 */
 	private void saveStep() {
 		lastStates.add(new State()); //add a new State Object (which will be initialized to the current game state) to the backup list
 		
@@ -287,7 +325,7 @@ public class Game {
 	}
 	
 	/**
-	 * Reset game score, field and state.
+	 * Resets the game. The game will restart
 	 * 
 	 */
 	public void reset(int size){
@@ -345,7 +383,7 @@ public class Game {
 	 * Collision detection and block removal if there are 4 or more blocks in a row in any direction.
 	 * Also increases the score if necessary
 	 * 
-	 * @param lastPoint
+	 * @param lastPoint point around which the checks should be made
 	 * @return True if any blocks got removed
 	 */
 	private boolean checkRemoveBlocks(final Point lastPoint){

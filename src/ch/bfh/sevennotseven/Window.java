@@ -53,6 +53,9 @@ public class Window  extends JFrame implements ActionListener, Game.UpdateListen
 		initMainLayout();
 	}
 	
+	/**
+	 * Creates the main layout
+	 */
 	private void initMainLayout() {
 		mainPanel = new JPanel();
 		cardLayout = new CardLayout();
@@ -65,6 +68,9 @@ public class Window  extends JFrame implements ActionListener, Game.UpdateListen
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
+	/**
+	 * Creates the layout of the game itself
+	 */
 	private void initGameLayout() {
 		
 		moves = new NextMovesCanvas(game);	
@@ -112,6 +118,9 @@ public class Window  extends JFrame implements ActionListener, Game.UpdateListen
 		mainPanel.add(gamePanel);
 	}
 	
+	/**
+	 * Creates the welcome screen layout
+	 */
 	private void initWelcomeLayout() {
 		JPanel welcomePanel = new JPanel();
 		welcomePanel.setLayout(new BoxLayout(welcomePanel, BoxLayout.Y_AXIS));

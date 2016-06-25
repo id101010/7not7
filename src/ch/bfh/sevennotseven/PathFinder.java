@@ -92,6 +92,7 @@ public class PathFinder {
 
 	}
 	
+	//Storage for last values
 	private ArrayList<Vertex> verticies = null;
 	private Point lastSrc = null;
 	private int[][] lastField = null;
@@ -155,6 +156,7 @@ public class PathFinder {
 			}
 		}
 		
+		//assign new values to storage
 		lastSrc = src;
 		verticies = allVerticies;	
 		lastField = field;

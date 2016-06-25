@@ -29,7 +29,7 @@ public class FieldCanvas extends JPanel{
 			new Color(0x486F70),
 			new Color(0xCBD840),
 			new Color(0x8B2700),
-			new Color(0x33CCCC)
+			new Color(0x439999)
 	};
 	
 	
@@ -47,6 +47,9 @@ public class FieldCanvas extends JPanel{
 	 */
 	FieldCanvas(Game g){
 		MouseAdapter ad = new MouseAdapter(){
+			/**
+			 * mousePressed Handler gets called when the user pressed the mouse button down
+			 */
 			@Override
 			public void mousePressed(MouseEvent e) {
 				super.mousePressed(e);
@@ -65,6 +68,9 @@ public class FieldCanvas extends JPanel{
 				}
 			}
 			
+			/**
+			 * mouseDrag Handler gets called when the user moves the mouse while the mouse button is pressed
+			 */
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				super.mouseDragged(e);
@@ -93,6 +99,9 @@ public class FieldCanvas extends JPanel{
 				}
 			};
 			
+			/**
+			 * mouseRelease Handler gets called when the user releases the mouse button
+			 */
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				super.mouseReleased(e);
