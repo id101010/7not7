@@ -154,9 +154,10 @@ public class FieldCanvas extends JPanel{
 	private Point getClickPoint(Point globalPos) {
 		int total = Math.min(this.getHeight()-borderTop-borderBottom,FieldCanvas.this.getWidth()-borderLeft-borderRight);
 		int space = total/game.getSize();
+		total = space*game.getSize();
 
 		globalPos.translate(-borderLeft, -borderTop);
-		if(globalPos.x<0 || globalPos.x >total  || globalPos.y < 0 || globalPos.y > total) return null;
+		if(globalPos.x<0 || globalPos.x >=total  || globalPos.y < 0 || globalPos.y >= total) return null;
 		return new Point(globalPos.x/space,globalPos.y/space);	
 	}
 	
@@ -220,6 +221,8 @@ public class FieldCanvas extends JPanel{
 			int sSpace = space/3;	
 			int sSpace2 = space/5;
 			
+			g.setColor(Color.lightGray);
+			g.fillRect(src.x*space+2, src.y*space+2, space -3, space -3);	
 			
 			g.setColor(c);
 			g.fillRect(src.x*space+2+sSpace2, src.y*space+2+sSpace2, space -3 - 2* sSpace2, space -3 - 2* sSpace2);
