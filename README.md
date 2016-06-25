@@ -11,7 +11,7 @@ This page should be viewed on [Github](https://github.com/id101010/7not7)
 To make things harder each round n blocks of random colors get thrown upon the field and the number n increases with each level.
 You can choose the field size to be either 7x7, 8x8, 9x9 or 10x10.
 
-![Moving Blocks](https://github.com/id101010/7not7/blob/master/doc/movingBlocks.png)
+![Moving Blocks](doc/movingBlocks.png)
 
 ### How to play
 
@@ -35,7 +35,17 @@ Additionally you earn FreeMoves by completing combos. FreeMoves enable you to be
 
 A combo is a game move in which you clear more than just one distinct line in one move.
 
-![Combo Move](https://github.com/id101010/7not7/blob/master/doc/gettingCombo.png)
+![Combo Move](doc/gettingCombo.png)
+
+### Class Overview
+
+Here's an overview of our main classes:
+
+![Main Classes](doc/cd2.bmp)
+
+The game object also exposes an UpdateListener Interface which is implemented by the Window and the NextMovesCanvas class: 
+
+![Listener relations](doc/cd3.bmp)
 
 ### Used software
 
